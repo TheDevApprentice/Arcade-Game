@@ -1,0 +1,284 @@
+/* ===== SPLASH SCREEN RETRO ARCADE - VERSION COMPATIBLE JAVAFX ===== */
+/* CSS Simplifié pour compatibilité JavaFX complète */
+
+/* === CONTENEUR PRINCIPAL === */
+.splash-container-enhanced {
+    -fx-background-color: linear-gradient(to bottom, #000814 0%, #001d3d 25%, #003566 50%, #001d3d 75%, #000814 100%);
+    -fx-border-color: #00d4ff;
+    -fx-border-width: 3px;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+    -fx-effect: dropshadow(gaussian, #00d4ff, 15, 0.6, 0, 0);
+    -fx-padding: 45px;
+}
+
+/* Anciens styles pour compatibilité */
+.splash-container {
+    -fx-background-color: linear-gradient(to bottom, #000814 0%, #001d3d 25%, #003566 50%, #001d3d 75%, #000814 100%);
+    -fx-border-color: #00d4ff;
+    -fx-border-width: 4px;
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
+    -fx-effect: dropshadow(gaussian, #00d4ff, 25, 0.8, 0, 0);
+    -fx-padding: 50px;
+}
+
+.logo-container {
+    -fx-padding: 20px;
+    /* Suppression de l'encadré rouge */
+}
+
+/* === TITRES AVEC EFFETS NÉON === */
+.title-neon-enhanced {
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-size: 42px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #00d4ff;
+    -fx-effect: dropshadow(gaussian, #00d4ff, 8, 0.6, 0, 0);
+}
+
+.title-enhanced {
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-size: 40px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #00d4ff;
+    -fx-effect: dropshadow(gaussian, #00d4ff, 6, 0.5, 0, 0);
+}
+
+.subtitle-gold-enhanced {
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-size: 20px;
+    -fx-text-fill: #ffd700;
+    -fx-effect: dropshadow(gaussian, #ffd700, 6, 0.5, 0, 0);
+}
+
+.subtitle-neon {
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-size: 22px;
+    -fx-text-fill: #ffd60a;
+    -fx-effect: dropshadow(gaussian, #ffd60a, 5, 0.4, 0, 0);
+}
+
+/* === CONTAINER DE PROGRESSION AVEC ENCADRÉ NÉON === */
+.progress-container-neon {
+    -fx-background-color: #001428;
+    -fx-border-color: #00d4ff;
+    -fx-border-width: 3px;
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
+    -fx-padding: 25px 30px;
+    -fx-effect: dropshadow(gaussian, #00d4ff, 12, 0.6, 0, 0);
+}
+
+.status-box {
+    -fx-background-color: #000a1a;
+    -fx-border-color: #00ff41;
+    -fx-border-width: 2px;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-padding: 12px 20px;
+    -fx-effect: dropshadow(gaussian, #00ff41, 8, 0.6, 0, 0);
+}
+
+/* === BARRE DE PROGRESSION === */
+.splash-progress-enhanced {
+    -fx-background-color: #000a1a;
+    -fx-border-color: #00ff41;
+    -fx-border-width: 2px;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-pref-width: 450px;
+    -fx-pref-height: 30px;
+    -fx-effect: dropshadow(gaussian, #00ff41, 12, 0.7, 0, 0);
+}
+
+.splash-progress-enhanced .track {
+    -fx-background-color: #001100;
+    -fx-background-radius: 10px;
+    -fx-border-color: #004400;
+    -fx-border-width: 1px;
+    -fx-border-radius: 10px;
+}
+
+.splash-progress-enhanced .bar {
+    -fx-background-color: #00ff41;
+    -fx-background-radius: 9px;
+    -fx-effect: dropshadow(gaussian, #00ff41, 8, 0.8, 0, 0);
+}
+
+/* === ÉTATS DE PROGRESSION === */
+.progress-starting-enhanced .bar {
+    -fx-background-color: #ff4757;
+    -fx-effect: dropshadow(gaussian, #ff4757, 12, 0.8, 0, 0);
+}
+
+.progress-starting-enhanced {
+    -fx-border-color: #ff4757;
+    -fx-effect: dropshadow(gaussian, #ff4757, 15, 0.7, 0, 0);
+}
+
+.progress-loading-enhanced .bar {
+    -fx-background-color: #ffd60a;
+    -fx-effect: dropshadow(gaussian, #ffd60a, 12, 0.8, 0, 0);
+}
+
+.progress-loading-enhanced {
+    -fx-border-color: #ffd60a;
+    -fx-effect: dropshadow(gaussian, #ffd60a, 15, 0.7, 0, 0);
+}
+
+.progress-completing-enhanced .bar {
+    -fx-background-color: #00ff41;
+    -fx-effect: dropshadow(gaussian, #00ff41, 15, 0.9, 0, 0);
+}
+
+.progress-completing-enhanced {
+    -fx-border-color: #00ff41;
+    -fx-effect: dropshadow(gaussian, #00ff41, 20, 0.8, 0, 0);
+}
+
+/* === TEXTES === */
+.status-terminal {
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-size: 16px;
+    -fx-text-fill: #00ff41;
+    -fx-effect: dropshadow(gaussian, #00ff41, 4, 0.4, 0, 0);
+}
+
+.status-text {
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-size: 15px;
+    -fx-text-fill: #00ff41;
+    -fx-effect: dropshadow(gaussian, #00ff41, 3, 0.3, 0, 0);
+}
+
+.version-futuristic {
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-size: 12px;
+    -fx-text-fill: #8892b0;
+    -fx-background-color: #001428;
+    -fx-border-color: #4a5568;
+    -fx-border-width: 1px;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+    -fx-padding: 8px 15px;
+    -fx-opacity: 0.9;
+    -fx-effect: dropshadow(gaussian, #4a5568, 5, 0.4, 0, 0);
+}
+
+.version-info {
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-size: 11px;
+    -fx-text-fill: #8892b0;
+    -fx-opacity: 0.8;
+    -fx-padding: 5px;
+}
+
+/* === EFFETS DE LUEUR SIMPLES === */
+.glow-cyan-intense {
+    -fx-effect: dropshadow(gaussian, #00d4ff, 6, 0.5, 0, 0);
+}
+
+.glow-gold-intense {
+    -fx-effect: dropshadow(gaussian, #ffd700, 5, 0.4, 0, 0);
+}
+
+.glow-green-intense {
+    -fx-effect: dropshadow(gaussian, #00ff41, 4, 0.4, 0, 0);
+}
+
+.glow-pink-intense {
+    -fx-effect: dropshadow(gaussian, #ff0080, 6, 0.5, 0, 0);
+}
+
+.glow-text {
+    -fx-effect: dropshadow(gaussian, #00d4ff, 5, 0.4, 0, 0);
+}
+
+.glow-text-yellow {
+    -fx-effect: dropshadow(gaussian, #ffd60a, 4, 0.3, 0, 0);
+}
+
+.glow-text-green {
+    -fx-effect: dropshadow(gaussian, #00ff41, 3, 0.3, 0, 0);
+}
+
+.glow-text-pink {
+    -fx-effect: dropshadow(gaussian, #ff0080, 4, 0.4, 0, 0);
+}
+
+/* === CONTENEUR HOLOGRAPHIQUE === */
+.holographic-container {
+    -fx-background-color: #001428;
+    -fx-border-color: #00d4ff;
+    -fx-border-width: 2px;
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
+    -fx-effect: dropshadow(gaussian, #00d4ff, 20, 0.6, 0, 0);
+}
+
+.hologram-text {
+    -fx-text-fill: #00d4ff;
+    -fx-font-family: "Courier New", monospace;
+    -fx-effect: dropshadow(gaussian, #00d4ff, 4, 0.4, 0, 0);
+}
+
+/* === STYLES ADDITIONNELS === */
+.pulse-glow {
+    -fx-effect: dropshadow(gaussian, #00d4ff, 20, 0.8, 0, 0);
+}
+
+.matrix-effect {
+    -fx-background-color: #000000;
+    -fx-text-fill: #00ff41;
+    -fx-font-family: "Courier New", monospace;
+    -fx-effect: dropshadow(gaussian, #00ff41, 8, 0.7, 0, 0);
+}
+
+.triple-neon-border {
+    -fx-border-color: #00d4ff;
+    -fx-border-width: 3px;
+    -fx-border-radius: 15px;
+    -fx-effect: dropshadow(gaussian, #00d4ff, 25, 0.8, 0, 0);
+}
+
+.dynamic-shine {
+    -fx-effect: dropshadow(gaussian, #00d4ff, 15, 0.8, 0, 0);
+}
+
+.blink-animation {
+    -fx-opacity: 1.0;
+}
+
+.loading-indicator {
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-size: 14px;
+    -fx-text-fill: #00ff41;
+    -fx-background-color: #000000;
+    -fx-padding: 8px 15px;
+    -fx-border-color: #00ff41;
+    -fx-border-width: 2px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-effect: dropshadow(gaussian, #00ff41, 5, 0.5, 0, 0);
+}
+
+.terminal-text {
+    -fx-font-family: "Courier New", monospace;
+    -fx-text-fill: #00ff41;
+    -fx-background-color: #000000;
+    -fx-border-color: #00ff41;
+    -fx-border-width: 1px;
+    -fx-padding: 5px 10px;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+}
+
+/* Splash logo */
+.splash-logo {
+    -fx-effect: dropshadow(gaussian, #ff0080, 8, 0.5, 0, 0);
+}
+
+.splash-logo-enhanced {
+    -fx-effect: dropshadow(gaussian, #ff0080, 10, 0.6, 0, 0);
+}

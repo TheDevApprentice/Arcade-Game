@@ -1,0 +1,339 @@
+/* ========================================
+   MENU PRINCIPAL - STYLE HOLOGRAPHIQUE LIKE SPLASH SCREEN
+   ======================================== */
+
+/* ===== BARRE DE TITRE CUSTOM ===== */
+
+/* Barre de titre principale */
+.custom-titlebar {
+    -fx-background-color: linear-gradient(to bottom, #001428, #000814);
+    -fx-border-color: #00d4ff;
+    -fx-border-width: 0 0 2px 0;
+    -fx-padding: 12px 20px;
+    -fx-effect: dropshadow(gaussian, #00d4ff, 8, 0.5, 0, 2);
+    -fx-pref-height: 45px;
+}
+
+/* Section titre avec icône */
+.title-section {
+    -fx-alignment: center-left;
+    -fx-spacing: 8px;
+}
+
+/* Icône de l'application */
+.app-icon {
+    -fx-font-size: 18px;
+    -fx-text-fill: #00d4ff;
+    -fx-effect: dropshadow(gaussian, #00d4ff, 5, 0.6, 0, 0);
+}
+
+/* Titre de l'application */
+.app-title {
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffd700;
+    -fx-effect: dropshadow(gaussian, #ffd700, 4, 0.5, 0, 0);
+}
+
+/* Container des boutons de contrôle */
+.control-buttons {
+    -fx-alignment: center-right;
+    -fx-spacing: 5px;
+}
+
+/* Boutons de la barre de titre */
+.titlebar-button {
+    -fx-background-color: transparent;
+    -fx-border-color: #00d4ff;
+    -fx-border-width: 1px;
+    -fx-border-radius: 3px;
+    -fx-background-radius: 3px;
+    -fx-text-fill: #00d4ff;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-min-width: 30px;
+    -fx-max-width: 30px;
+    -fx-min-height: 25px;
+    -fx-max-height: 25px;
+    -fx-padding: 0;
+}
+
+.titlebar-button:hover {
+    -fx-background-color: rgba(0, 212, 255, 0.1);
+    -fx-effect: dropshadow(gaussian, #00d4ff, 6, 0.6, 0, 0);
+}
+
+/* Bouton minimiser */
+.minimize-button {
+    -fx-border-color: #ffd700;
+    -fx-text-fill: #ffd700;
+}
+
+.minimize-button:hover {
+    -fx-background-color: rgba(255, 215, 0, 0.1);
+    -fx-effect: dropshadow(gaussian, #ffd700, 6, 0.6, 0, 0);
+}
+
+/* Bouton fermer */
+.close-button {
+    -fx-border-color: #ff4757;
+    -fx-text-fill: #ff4757;
+}
+
+.close-button:hover {
+    -fx-background-color: rgba(255, 71, 87, 0.1);
+    -fx-effect: dropshadow(gaussian, #ff4757, 6, 0.6, 0, 0);
+}
+
+.close-button:pressed {
+    -fx-background-color: rgba(255, 71, 87, 0.2);
+    -fx-text-fill: #ffffff;
+}
+
+/* ===== MENU PRINCIPAL ===== */
+
+/* Container principal du menu - MÊME STYLE QUE SPLASH */
+.menu-container {
+    -fx-background-color: linear-gradient(to bottom, #000814 0%, #001d3d 25%, #003566 50%, #001d3d 75%, #000814 100%);
+    -fx-border-color: #00d4ff;
+    -fx-border-width: 4px;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+    -fx-effect: dropshadow(gaussian, #00d4ff, 25, 0.8, 0, 0);
+    -fx-padding: 50px 50px 80px 50px;
+    -fx-alignment: center;
+}
+
+/* Logo/Titre du jeu - STYLE SPLASH AMÉLIORÉ */
+.game-logo {
+    -fx-font-size: 48px;
+    -fx-text-fill: #00d4ff;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, #00d4ff, 20, 0.8, 0, 0);
+    -fx-padding: 0 0 20px 0;
+}
+
+/* Sous-titre du menu - STYLE DORÉ COMME SPLASH */
+.menu-subtitle {
+    -fx-font-size: 20px;
+    -fx-text-fill: #ffd700;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, #ffd700, 8, 0.6, 0, 0);
+    -fx-padding: 0 0 30px 0;
+}
+
+/* Container des boutons de menu */
+.menu-buttons {
+    -fx-spacing: 25px;
+    -fx-alignment: center;
+    -fx-padding: 20px 0;
+}
+
+/* Boutons du menu principal - STYLE HOLOGRAPHIQUE */
+.menu-button {
+    -fx-background-color: #001428;
+    -fx-border-color: #00d4ff;
+    -fx-border-width: 3px;
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
+    -fx-text-fill: #00d4ff;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-padding: 18px 45px;
+    -fx-min-width: 280px;
+    -fx-alignment: center;
+    -fx-effect: dropshadow(gaussian, #00d4ff, 12, 0.6, 0, 0);
+}
+
+.menu-button:hover {
+    -fx-background-color: #002040;
+    -fx-border-color: #00ffff;
+    -fx-text-fill: #00ffff;
+    -fx-effect: dropshadow(gaussian, #00ffff, 15, 0.7, 0, 0);
+    -fx-cursor: hand;
+}
+
+.menu-button:pressed {
+    -fx-background-color: #001020;
+    -fx-border-color: #0099cc;
+    -fx-text-fill: #0099cc;
+    -fx-scale-x: 0.98;
+    -fx-scale-y: 0.98;
+    -fx-effect: dropshadow(gaussian, #0099cc, 15, 0.7, 0, 0);
+}
+
+/* Bouton Snake - VERT NÉON COMME SPLASH */
+.snake-button {
+    -fx-border-color: #00ff41;
+    -fx-text-fill: #00ff41;
+    -fx-effect: dropshadow(gaussian, #00ff41, 12, 0.6, 0, 0);
+}
+
+.snake-button:hover {
+    -fx-background-color: rgba(0, 255, 65, 0.08);
+    -fx-border-color: #00ff41;
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, #00ff41, 15, 0.7, 0, 0);
+}
+
+/* Bouton Pong - CYAN INTENSE */
+.pong-button {
+    -fx-border-color: #00d4ff;
+    -fx-text-fill: #00d4ff;
+    -fx-effect: dropshadow(gaussian, #00d4ff, 12, 0.6, 0, 0);
+}
+
+.pong-button:hover {
+    -fx-background-color: rgba(0, 212, 255, 0.08);
+    -fx-border-color: #00d4ff;
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, #00d4ff, 15, 0.7, 0, 0);
+}
+
+/* Bouton Quitter - ROUGE ÉLÉGANT */
+.quit-button {
+    -fx-border-color: #ff4757;
+    -fx-text-fill: #ff4757;
+    -fx-effect: dropshadow(gaussian, #ff4757, 12, 0.6, 0, 0);
+}
+
+.quit-button:hover {
+    -fx-background-color: rgba(255, 71, 87, 0.08);
+    -fx-border-color: #ff4757;
+    -fx-text-fill: #ffffff;
+    -fx-effect: dropshadow(gaussian, #ff4757, 15, 0.7, 0, 0);
+}
+
+/* High score display - CONTAINER HOLOGRAPHIQUE */
+.highscore-display {
+    -fx-background-color: #001428;
+    -fx-border-color: #00d4ff;
+    -fx-border-width: 3px;
+    -fx-border-radius: 15px;
+    -fx-background-radius: 15px;
+    -fx-padding: 25px 30px;
+    -fx-effect: dropshadow(gaussian, #00d4ff, 15, 0.7, 0, 0);
+    -fx-spacing: 15px;
+    -fx-alignment: center;
+}
+
+/* Titre HIGH SCORES */
+.subtitle-label {
+    -fx-font-size: 22px;
+    -fx-text-fill: #ffd700;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, #ffd700, 8, 0.6, 0, 0);
+}
+
+/* Scores Snake */
+.snake-score {
+    -fx-font-size: 18px;
+    -fx-text-fill: #00ff41;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, #00ff41, 6, 0.5, 0, 0);
+}
+
+/* Scores Pong */
+.pong-player-score {
+    -fx-font-size: 18px;
+    -fx-text-fill: #00d4ff;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, #00d4ff, 6, 0.5, 0, 0);
+}
+
+/* Score values */
+.score-label {
+    -fx-font-size: 24px;
+    -fx-text-fill: #ffffff;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, #ffffff, 5, 0.4, 0, 0);
+}
+
+/* Instructions en bas - STYLE TERMINAL */
+.menu-instructions {
+    -fx-font-size: 14px;
+    -fx-text-fill: #8892b0;
+    -fx-font-family: "Courier New", monospace;
+    -fx-background-color: #001428;
+    -fx-border-color: #4a5568;
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 15px 25px;
+    -fx-text-alignment: center;
+    -fx-effect: dropshadow(gaussian, #4a5568, 8, 0.5, 0, 0);
+}
+
+/* Footer avec version - STYLE BADGE */
+.menu-footer {
+    -fx-font-size: 12px;
+    -fx-text-fill: #8892b0;
+    -fx-font-family: "Courier New", monospace;
+    -fx-background-color: #001428;
+    -fx-border-color: #4a5568;
+    -fx-border-width: 1px;
+    -fx-border-radius: 20px;
+    -fx-background-radius: 20px;
+    -fx-padding: 8px 15px;
+    -fx-opacity: 0.9;
+    -fx-effect: dropshadow(gaussian, #4a5568, 5, 0.4, 0, 0);
+}
+
+/* HBox pour les scores côte à côte */
+.score-row {
+    -fx-spacing: 60px;
+    -fx-alignment: center;
+    -fx-padding: 10px 0;
+}
+
+/* Containers individuels des scores */
+.score-container {
+    -fx-background-color: rgba(0, 20, 40, 0.7);
+    -fx-border-color: rgba(0, 212, 255, 0.5);
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-padding: 15px 25px;
+    -fx-spacing: 8px;
+    -fx-alignment: center;
+    -fx-min-width: 120px;
+}
+
+/* Animation hover pour les containers de scores */
+.score-container:hover {
+    -fx-background-color: rgba(0, 212, 255, 0.1);
+    -fx-border-color: #00d4ff;
+    -fx-effect: dropshadow(gaussian, #00d4ff, 10, 0.6, 0, 0);
+}
+
+/* Effet de brillance pour le titre principal */
+.game-logo:hover {
+    -fx-effect: dropshadow(gaussian, #00d4ff, 30, 1.0, 0, 0);
+}
+
+/* Style pour les labels des jeux dans les scores */
+.game-label {
+    -fx-font-size: 14px;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-weight: bold;
+}
+
+/* Variantes de couleurs pour les labels de jeux */
+.game-label-snake {
+    -fx-text-fill: #00ff41;
+    -fx-effect: dropshadow(gaussian, #00ff41, 4, 0.4, 0, 0);
+}
+
+.game-label-pong {
+    -fx-text-fill: #00d4ff;
+    -fx-effect: dropshadow(gaussian, #00d4ff, 4, 0.4, 0, 0);
+}

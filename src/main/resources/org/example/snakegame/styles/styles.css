@@ -1,0 +1,148 @@
+/* ========================================
+   STYLES GÉNÉRAUX - THÈME RÉTRO ARCADE 80s
+   ======================================== */
+
+/* Couleurs rétro */
+:root {
+    -fx-retro-bg: #0a0a0a;
+    -fx-retro-green: #00ff41;
+    -fx-retro-cyan: #00ffff;
+    -fx-retro-pink: #ff00ff;
+    -fx-retro-yellow: #ffff00;
+    -fx-retro-red: #ff0040;
+    -fx-retro-blue: #0080ff;
+    -fx-retro-orange: #ff8000;
+}
+
+/* Application principale */
+.root {
+    -fx-background-color: #0a0a0a;
+    -fx-font-family: "Courier New", "Consolas", monospace;
+}
+
+/* Textes généraux */
+.label {
+    -fx-text-fill: #00ff41;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-weight: bold;
+}
+
+/* Titre principal */
+.title-label {
+    -fx-font-size: 32px;
+    -fx-text-fill: #00ffff;
+    -fx-effect: dropshadow(gaussian, #00ffff, 10, 0.7, 0, 0);
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-weight: bold;
+}
+
+/* Sous-titres */
+.subtitle-label {
+    -fx-font-size: 18px;
+    -fx-text-fill: #ff00ff;
+    -fx-font-family: "Courier New", monospace;
+}
+
+/* Score et infos */
+.score-label {
+    -fx-font-size: 20px;
+    -fx-text-fill: #ffff00;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, #ffff00, 5, 0.5, 0, 0);
+}
+
+/* Boutons rétro */
+.button {
+    -fx-background-color: transparent;
+    -fx-border-color: #00ff41;
+    -fx-border-width: 2px;
+    -fx-text-fill: #00ff41;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-padding: 10px 20px;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+.button:hover {
+    -fx-background-color: #00ff41;
+    -fx-text-fill: #0a0a0a;
+    -fx-effect: dropshadow(gaussian, #00ff41, 15, 0.8, 0, 0);
+}
+
+.button:pressed {
+    -fx-background-color: #00cc33;
+    -fx-border-color: #00cc33;
+}
+
+/* Boutons de couleurs différentes */
+.button-cyan {
+    -fx-border-color: #00ffff;
+    -fx-text-fill: #00ffff;
+}
+
+.button-cyan:hover {
+    -fx-background-color: #00ffff;
+    -fx-text-fill: #0a0a0a;
+    -fx-effect: dropshadow(gaussian, #00ffff, 15, 0.8, 0, 0);
+}
+
+.button-pink {
+    -fx-border-color: #ff00ff;
+    -fx-text-fill: #ff00ff;
+}
+
+.button-pink:hover {
+    -fx-background-color: #ff00ff;
+    -fx-text-fill: #0a0a0a;
+    -fx-effect: dropshadow(gaussian, #ff00ff, 15, 0.8, 0, 0);
+}
+
+/* Conteneurs */
+.game-container {
+    -fx-background-color: #0a0a0a;
+    -fx-border-color: #00ff41;
+    -fx-border-width: 3px;
+    -fx-padding: 20px;
+}
+
+/* Canvas de jeu */
+.game-canvas {
+    -fx-background-color: #000000;
+    -fx-border-color: #00ffff;
+    -fx-border-width: 2px;
+    -fx-effect: dropshadow(gaussian, #00ffff, 10, 0.6, 0, 0);
+}
+
+/* Messages de game over */
+.game-over-label {
+    -fx-font-size: 28px;
+    -fx-text-fill: #ff0040;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, #ff0040, 15, 0.9, 0, 0);
+}
+
+/* Messages de pause */
+.pause-label {
+    -fx-font-size: 24px;
+    -fx-text-fill: #ffff00;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, #ffff00, 10, 0.7, 0, 0);
+}
+
+/* Layout principal */
+.main-layout {
+    -fx-background-color: linear-gradient(to bottom, #0a0a0a, #1a1a1a);
+    -fx-padding: 20px;
+}
+
+/* Animations clignotantes */
+@keyframes blink {
+    0% { -fx-opacity: 1.0; }
+    50% { -fx-opacity: 0.3; }
+    100% { -fx-opacity: 1.0; }
+}

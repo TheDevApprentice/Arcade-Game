@@ -1,0 +1,162 @@
+/* ========================================
+   SNAKE GAME - THÈME RÉTRO VERT NÉON
+   ======================================== */
+
+/* Container principal du jeu Snake */
+.snake-game-container {
+    -fx-background-color: radial-gradient(center 50% 50%, radius 70%, #001100, #000000);
+    -fx-padding: 20px;
+}
+
+/* Canvas de jeu Snake */
+.snake-canvas {
+    -fx-background-color: #000000;
+    -fx-border-color: #00ff41;
+    -fx-border-width: 3px;
+    -fx-effect: dropshadow(gaussian, #00ff41, 15, 0.8, 0, 0);
+}
+
+/* Panneau d'informations Snake */
+.snake-info-panel {
+    -fx-background-color: rgba(0, 255, 65, 0.1);
+    -fx-border-color: #00ff41;
+    -fx-border-width: 2px;
+    -fx-padding: 15px;
+    -fx-spacing: 10px;
+}
+
+/* Score du Snake */
+.snake-score {
+    -fx-font-size: 24px;
+    -fx-text-fill: #00ff41;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, #00ff41, 8, 0.6, 0, 0);
+}
+
+/* High Score Snake */
+.snake-highscore {
+    -fx-font-size: 18px;
+    -fx-text-fill: #00cc33;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-weight: bold;
+}
+
+/* Longueur du serpent */
+.snake-length {
+    -fx-font-size: 16px;
+    -fx-text-fill: #66ff66;
+    -fx-font-family: "Courier New", monospace;
+}
+
+/* Vitesse du jeu */
+.snake-speed {
+    -fx-font-size: 14px;
+    -fx-text-fill: #99ff99;
+    -fx-font-family: "Courier New", monospace;
+}
+
+/* Message de Game Over Snake */
+.snake-game-over {
+    -fx-font-size: 32px;
+    -fx-text-fill: #ff0040;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, #ff0040, 20, 0.9, 0, 0);
+    -fx-background-color: rgba(255, 0, 64, 0.2);
+    -fx-padding: 20px;
+    -fx-border-color: #ff0040;
+    -fx-border-width: 2px;
+}
+
+/* Message de pause Snake */
+.snake-pause {
+    -fx-font-size: 28px;
+    -fx-text-fill: #ffff00;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-weight: bold;
+    -fx-effect: dropshadow(gaussian, #ffff00, 15, 0.8, 0, 0);
+    -fx-background-color: rgba(255, 255, 0, 0.2);
+    -fx-padding: 15px;
+    -fx-border-color: #ffff00;
+    -fx-border-width: 2px;
+}
+
+/* Instructions de contrôle Snake */
+.snake-controls {
+    -fx-font-size: 12px;
+    -fx-text-fill: #888888;
+    -fx-font-family: "Courier New", monospace;
+    -fx-padding: 10px 0;
+    -fx-text-alignment: center;
+}
+
+/* Boutons de contrôle Snake */
+.snake-control-button {
+    -fx-background-color: transparent;
+    -fx-border-color: #00ff41;
+    -fx-border-width: 2px;
+    -fx-text-fill: #00ff41;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-size: 14px;
+    -fx-padding: 8px 16px;
+    -fx-background-radius: 0;
+    -fx-border-radius: 0;
+}
+
+.snake-control-button:hover {
+    -fx-background-color: #00ff41;
+    -fx-text-fill: #000000;
+    -fx-effect: dropshadow(gaussian, #00ff41, 10, 0.7, 0, 0);
+}
+
+/* Bouton Restart spécifique */
+.snake-restart-button {
+    -fx-border-color: #ffff00;
+    -fx-text-fill: #ffff00;
+}
+
+.snake-restart-button:hover {
+    -fx-background-color: #ffff00;
+    -fx-text-fill: #000000;
+    -fx-effect: dropshadow(gaussian, #ffff00, 10, 0.7, 0, 0);
+}
+
+/* Bouton Menu spécifique */
+.snake-menu-button {
+    -fx-border-color: #00ffff;
+    -fx-text-fill: #00ffff;
+}
+
+.snake-menu-button:hover {
+    -fx-background-color: #00ffff;
+    -fx-text-fill: #000000;
+    -fx-effect: dropshadow(gaussian, #00ffff, 10, 0.7, 0, 0);
+}
+
+/* Niveau de difficulté */
+.snake-level {
+    -fx-font-size: 16px;
+    -fx-text-fill: #00ff41;
+    -fx-font-family: "Courier New", monospace;
+    -fx-font-weight: bold;
+}
+
+/* Statistiques du jeu */
+.snake-stats {
+    -fx-background-color: rgba(0, 255, 65, 0.05);
+    -fx-border-color: #004400;
+    -fx-border-width: 1px;
+    -fx-padding: 10px;
+    -fx-spacing: 5px;
+}
+
+/* Animation pour le serpent qui mange */
+.snake-eating-effect {
+    -fx-effect: dropshadow(gaussian, #00ff41, 25, 1.0, 0, 0);
+}
+
+/* Grid overlay pour l'aspect pixelisé */
+.snake-grid {
+    -fx-background-color: #000000;
+}

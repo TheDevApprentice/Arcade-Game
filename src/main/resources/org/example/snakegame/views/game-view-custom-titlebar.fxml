@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.layout.HBox?>
+
+<VBox xmlns="http://javafx.com/javafx/11.0.1"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.snakegame.GameController">
+
+    <!-- BARRE DE TITRE CUSTOM -->
+    <HBox fx:id="titleBar" styleClass="custom-titlebar" alignment="CENTER_LEFT" spacing="10.0">
+
+        <!-- Icône et titre -->
+        <HBox alignment="CENTER_LEFT" spacing="8.0" styleClass="title-section">
+            <Label text="🕹️" styleClass="app-icon" />
+            <Label text="RETRO ARCADE" styleClass="app-title" />
+        </HBox>
+
+        <!-- Spacer pour pousser les boutons à droite -->
+        <HBox HBox.hgrow="ALWAYS" />
+
+        <!-- Boutons de contrôle -->
+        <HBox spacing="5.0" styleClass="control-buttons">
+            <Button fx:id="minimizeButton" styleClass="titlebar-button, minimize-button" text="–"
+                    onAction="#onMinimizeButtonClick" />
+            <Button fx:id="closeButton" styleClass="titlebar-button, close-button" text="✕"
+                    onAction="#onCloseButtonClick" />
+        </HBox>
+
+    </HBox>
+
+    <!-- CONTENU PRINCIPAL DU MENU -->
+    <VBox alignment="CENTER" spacing="35.0" styleClass="menu-container"
+          xmlns="http://javafx.com/javafx/11.0.1"
+          xmlns:fx="http://javafx.com/fxml/1">
+
+        <!-- Sous-titre avec style doré -->
+        <Label styleClass="menu-subtitle" text="▶ Sélectionnez votre jeu ◀" />
+
+        <!-- Container des boutons de menu avec espacement amélioré -->
+        <VBox alignment="CENTER" spacing="25.0" styleClass="menu-buttons">
+
+            <!-- Bouton Snake avec style vert néon -->
+            <Button fx:id="snakeButton"
+                    styleClass="menu-button, snake-button"
+                    text="🐍 SNAKE GAME"
+                    onAction="#onSnakeButtonClick"
+                    prefWidth="280.0" />
+
+            <!-- Bouton Pong avec style cyan -->
+            <Button fx:id="pongButton"
+                    styleClass="menu-button, pong-button"
+                    text="🏓 PONG GAME"
+                    onAction="#onPongButtonClick"
+                    prefWidth="280.0" />
+
+            <!-- Espace entre jeux et quitter -->
+            <VBox prefHeight="15.0" />
+
+            <!-- Bouton Quitter avec style rouge élégant -->
+            <Button fx:id="quitButton"
+                    styleClass="menu-button, quit-button"
+                    text="✦ QUITTER ✦"
+                    onAction="#onQuitButtonClick"
+                    prefWidth="280.0" />
+        </VBox>
+
+        <!-- High Scores Display avec container holographique -->
+        <VBox alignment="CENTER" spacing="15.0" styleClass="highscore-display">
+
+            <!-- Titre des scores -->
+            <Label text="✧ HIGH SCORES ✧" styleClass="subtitle-label" />
+
+            <!-- Scores en ligne avec containers individuels -->
+            <HBox spacing="60.0" alignment="CENTER" styleClass="score-row">
+
+                <!-- Container Score Snake -->
+                <VBox alignment="CENTER" spacing="8.0" styleClass="score-container">
+                    <Label text="SNAKE" styleClass="game-label, game-label-snake" />
+                    <Label fx:id="snakeHighScore" text="0000" styleClass="score-label" />
+                </VBox>
+
+                <!-- Container Score Pong -->
+                <VBox alignment="CENTER" spacing="8.0" styleClass="score-container">
+                    <Label text="PONG" styleClass="game-label, game-label-pong" />
+                    <Label fx:id="pongHighScore" text="0-0" styleClass="score-label" />
+                </VBox>
+
+            </HBox>
+        </VBox>
+
+        <!-- Footer avec badge stylé -->
+        <!-- <Label styleClass="menu-footer" text="⚡ Retro Arcade v1.0 - Powered by JavaFX ⚡" /> -->
+    </VBox>
+</VBox>
