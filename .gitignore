@@ -37,4 +37,5 @@ build/
 ### Mac OS ###
 .DS_Store
 
-code_analysis_report.md
+*report.md
+*fixed.md
