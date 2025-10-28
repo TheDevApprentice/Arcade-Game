@@ -88,6 +88,11 @@ public class SnakeController {
      * Configurer la boucle de jeu avec meilleure performance
      */
     private void setupGameLoop() {
+        // Arrêter l'ancienne Timeline si elle existe pour éviter les fuites mémoire
+        if (gameLoop != null) {
+            gameLoop.stop();
+        }
+        
         gameLoop = new Timeline(new KeyFrame(
                 Duration.millis(gameSpeed),
                 e -> updateGame()
