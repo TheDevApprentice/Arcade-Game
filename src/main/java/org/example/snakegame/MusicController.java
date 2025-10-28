@@ -99,11 +99,15 @@ public class MusicController {
     }
 
     /**
-     * Obtenir l'instance unique du MusicController
+     * Obtenir l'instance unique du MusicController (thread-safe avec double-checked locking)
      */
     public static MusicController getInstance() {
         if (instance == null) {
-            instance = new MusicController();
+            synchronized (MusicController.class) {
+                if (instance == null) {
+                    instance = new MusicController();
+                }
+            }
         }
         return instance;
     }
