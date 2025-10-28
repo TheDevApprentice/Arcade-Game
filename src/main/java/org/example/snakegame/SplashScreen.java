@@ -181,10 +181,21 @@ public class SplashScreen {
      */
     private ImageView createLogoView() {
         try {
-            // Charger l'image icon2.png
-            Image logoImage = new Image(
-                    getClass().getResourceAsStream("/org/example/snakegame/images/icon2.png")
-            );
+            // Charger l'image icon2.png avec vérification null
+            java.io.InputStream imageStream = getClass().getResourceAsStream("/org/example/snakegame/images/icon2.png");
+            
+            if (imageStream == null) {
+                System.err.println("⚠️ Fichier icon2.png introuvable dans les ressources");
+                return createFallbackLogoView();
+            }
+
+            Image logoImage = new Image(imageStream);
+            
+            // Vérifier que l'image est valide
+            if (logoImage.isError()) {
+                System.err.println("⚠️ Erreur lors du chargement de icon2.png: " + logoImage.getException().getMessage());
+                return createFallbackLogoView();
+            }
 
             ImageView logoView = new ImageView(logoImage);
             logoView.setFitWidth(220);
@@ -199,26 +210,34 @@ public class SplashScreen {
             return logoView;
 
         } catch (Exception e) {
-            System.err.println("⚠️ Impossible de charger icon2.png: " + e.getMessage());
-            System.out.println("🔄 Utilisation du logo de secours...");
-
-            // Fallback: créer une ImageView vide mais stylée
-            ImageView fallbackView = new ImageView();
-            fallbackView.setFitWidth(220);
-            fallbackView.setFitHeight(220);
-
-            // Créer un style de fond pour remplacer l'image
-            fallbackView.setStyle(
-                    "-fx-background-color: radial-gradient(center 50% 50%, radius 80%, #ff0080, #000000);" +
-                            "-fx-border-color: #ff0080;" +
-                            "-fx-border-width: 3px;" +
-                            "-fx-border-radius: 15px;" +
-                            "-fx-background-radius: 15px;" +
-                            "-fx-effect: dropshadow(gaussian, #ff0080, 20, 0.8, 0, 0);"
-            );
-
-            return fallbackView;
+            System.err.println("⚠️ Exception lors du chargement de icon2.png: " + e.getMessage());
+            e.printStackTrace();
+            return createFallbackLogoView();
         }
+    }
+
+    /**
+     * Créer un logo de secours si l'image n'est pas disponible
+     */
+    private ImageView createFallbackLogoView() {
+        System.out.println("🔄 Utilisation du logo de secours...");
+
+        // Fallback: créer une ImageView vide mais stylée
+        ImageView fallbackView = new ImageView();
+        fallbackView.setFitWidth(220);
+        fallbackView.setFitHeight(220);
+
+        // Créer un style de fond pour remplacer l'image
+        fallbackView.setStyle(
+                "-fx-background-color: radial-gradient(center 50% 50%, radius 80%, #ff0080, #000000);" +
+                        "-fx-border-color: #ff0080;" +
+                        "-fx-border-width: 3px;" +
+                        "-fx-border-radius: 15px;" +
+                        "-fx-background-radius: 15px;" +
+                        "-fx-effect: dropshadow(gaussian, #ff0080, 20, 0.8, 0, 0);"
+        );
+
+        return fallbackView;
     }
 
     /**

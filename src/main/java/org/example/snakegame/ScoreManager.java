@@ -44,11 +44,15 @@ public class ScoreManager {
     }
 
     /**
-     * Obtenir l'instance unique du ScoreManager
+     * Obtenir l'instance unique du ScoreManager (thread-safe avec double-checked locking)
      */
     public static ScoreManager getInstance() {
         if (instance == null) {
-            instance = new ScoreManager();
+            synchronized (ScoreManager.class) {
+                if (instance == null) {
+                    instance = new ScoreManager();
+                }
+            }
         }
         return instance;
     }

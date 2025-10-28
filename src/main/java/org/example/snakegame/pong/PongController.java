@@ -114,6 +114,11 @@ public class PongController {
      * Configurer la boucle de jeu (60 FPS)
      */
     private void setupGameLoop() {
+        // Arrêter l'ancienne Timeline si elle existe pour éviter les fuites mémoire
+        if (gameLoop != null) {
+            gameLoop.stop();
+        }
+        
         gameLoop = new Timeline(new KeyFrame(
                 Duration.millis(16.67), // ~60 FPS
                 e -> updateGame()
