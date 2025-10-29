@@ -4,7 +4,6 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
-import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import org.example.snakegame.MusicController;
 import org.example.snakegame.ScoreManager;
@@ -33,7 +32,7 @@ public class PongController extends AbstractGameController {
     private static final int WINNING_SCORE = 5;
 
     // État du jeu (gameState et gameLoop sont dans AbstractGameController)
-    private final GraphicsContext gc;
+    // GraphicsContext passé uniquement au renderer (SRP)
     
     // Renderer dédié (SRP)
     private final PongRenderer renderer;
@@ -64,7 +63,7 @@ public class PongController extends AbstractGameController {
      */
     public PongController(GraphicsContext gc) {
         super(PongController.class);
-        this.gc = ValidationUtils.requireNonNull(gc, "graphicsContext");
+        ValidationUtils.requireNonNull(gc, "graphicsContext");
         this.renderer = new PongRenderer(gc, CANVAS_WIDTH, CANVAS_HEIGHT, WINNING_SCORE);
         this.scoreManager = ScoreManager.getInstance();
         this.musicController = MusicController.getInstance();
@@ -320,145 +319,11 @@ public class PongController extends AbstractGameController {
     }
 
     /**
-     * Rendu graphique principal
+     * Rendu graphique principal - Délégation au renderer (SRP)
      */
     public void render() {
-        // Effacer le canvas
-        gc.setFill(Color.BLACK);
-        gc.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-
-        // Dessiner le terrain
-        drawField();
-
-        // Dessiner les raquettes
-        drawPaddles();
-
-        // Dessiner la balle
-        drawBall();
-
-        // Dessiner les messages d'état
-        drawStatusMessages();
-
-        // Bordure du jeu
-        drawBorder();
-    }
-
-    /**
-     * Dessiner le terrain de jeu
-     */
-    private void drawField() {
-        // Ligne centrale en pointillés
-        gc.setStroke(Color.CYAN);
-        gc.setLineWidth(3);
-
-        double dashLength = 15;
-        double gapLength = 10;
-        for (double y = dashLength; y < CANVAS_HEIGHT; y += dashLength + gapLength) {
-            gc.strokeLine(CANVAS_WIDTH/2, y, CANVAS_WIDTH/2,
-                    Math.min(y + dashLength, CANVAS_HEIGHT));
-        }
-    }
-
-    /**
-     * Dessiner les raquettes
-     */
-    private void drawPaddles() {
-        gc.setFill(Color.CYAN);
-
-        // Raquette gauche (Joueur 1)
-        gc.fillRect(leftPaddle.getX(), leftPaddle.getY(),
-                leftPaddle.getWidth(), leftPaddle.getHeight());
-
-        // Raquette droite (IA)
-        gc.fillRect(rightPaddle.getX(), rightPaddle.getY(),
-                rightPaddle.getWidth(), rightPaddle.getHeight());
-
-        // Effet de brillance sur les raquettes
-        gc.setFill(Color.WHITE);
-        gc.fillRect(leftPaddle.getX() + 2, leftPaddle.getY() + 5,
-                3, leftPaddle.getHeight() - 10);
-        gc.fillRect(rightPaddle.getX() + 2, rightPaddle.getY() + 5,
-                3, rightPaddle.getHeight() - 10);
-    }
-
-    /**
-     * Dessiner la balle avec effet de traînée
-     */
-    private void drawBall() {
-        // Effet de traînée selon la vitesse
-        double speed = ball.getTotalVelocity();
-        int trailLength = (int)(speed * 2);
-
-        for (int i = 1; i <= trailLength; i++) {
-            double trailX = ball.getX() - (ball.getVelocityX() / speed) * i * 3;
-            double trailY = ball.getY() - (ball.getVelocityY() / speed) * i * 3;
-            double alpha = 1.0 - (double)i / trailLength;
-
-            gc.setFill(Color.rgb(255, 255, 255, alpha * 0.5));
-            gc.fillOval(trailX, trailY, ball.getSize() * alpha, ball.getSize() * alpha);
-        }
-
-        // Balle principale
-        gc.setFill(Color.WHITE);
-        gc.fillOval(ball.getX(), ball.getY(), ball.getSize(), ball.getSize());
-    }
-
-    /**
-     * Dessiner les messages d'état - CORRIGÉ: Contrôles mis à jour
-     */
-    private void drawStatusMessages() {
-        gc.setFill(Color.WHITE);
-        gc.setFont(javafx.scene.text.Font.font("Courier New", 16));
-
-        String message = switch (gameState) {
-            case WAITING_RESTART -> "Appuyez sur ENTRÉE pour commencer !";
-            case PAUSED -> "JEU EN PAUSE - Appuyez sur ESPACE";
-            case VICTORY -> {
-                String winner = player1Score >= WINNING_SCORE ? "JOUEUR 1" : "IA";
-                yield winner + " GAGNE ! - Appuyez sur R pour rejouer";
-            }
-            default -> "";
-        };
-
-        if (!message.isEmpty()) {
-            double textWidth = message.length() * 8; // Approximation
-            gc.fillText(message, (CANVAS_WIDTH - textWidth) / 2, CANVAS_HEIGHT / 2 + 100);
-        }
-
-        // Instructions de difficulté - CORRIGÉ: Nouveaux contrôles
-        if (gameState == GameState.WAITING_RESTART) {
-            gc.setFont(javafx.scene.text.Font.font("Courier New", 12));
-            gc.fillText("1: Facile | 2: Moyen | 3: Difficile", 20, CANVAS_HEIGHT - 40);
-            gc.fillText("↑/↓: Contrôles Joueur 1", 20, CANVAS_HEIGHT - 20); // Mis à jour
-        }
-
-        // Afficher les statistiques en cours de jeu
-        if (gameState == GameState.PLAYING) {
-            gc.setFont(javafx.scene.text.Font.font("Courier New", 10));
-            gc.fillText("Rebonds: " + ball.getBounceCount(), 10, 20);
-            gc.fillText("Vitesse: " + String.format("%.1f", ball.getSpeed()), 10, 35);
-            gc.fillText("IA: " + (int)(rightPaddle.getAIDifficulty() * 100) + "%", 10, 50);
-        }
-
-        // Afficher les scores globaux en fin de partie
-        if (gameState == GameState.VICTORY) {
-            gc.setFont(javafx.scene.text.Font.font("Courier New", 12));
-            gc.setFill(Color.YELLOW);
-
-            int baseY = CANVAS_HEIGHT / 2 + 140;
-            gc.fillText("Score global: " + scoreManager.getPongScore(), 20, baseY);
-            gc.fillText("Parties jouées: " + scoreManager.getPongGamesPlayed(), 20, baseY + 20);
-            gc.fillText("Taux de victoire: " + String.format("%.1f%%", scoreManager.getPongWinRate()), 20, baseY + 40);
-        }
-    }
-
-    /**
-     * Dessiner la bordure
-     */
-    private void drawBorder() {
-        gc.setStroke(Color.CYAN);
-        gc.setLineWidth(2);
-        gc.strokeRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        renderer.render(leftPaddle, rightPaddle, ball, 
+                       player1Score, player2Score, gameState);
     }
 
     // Getters pour l'interface (utilisant maintenant les objets)
