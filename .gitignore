@@ -36,3 +36,12 @@ build/
 
 ### Mac OS ###
 .DS_Store
+
+# Build artifacts
+*.exe
+*.zip
+target/dist/
+target/*.zip
+
+*report.md
+*fixed.md

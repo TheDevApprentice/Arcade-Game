@@ -12,10 +12,10 @@ public class Ball {
     private double velocityX;
     private double velocityY;
     private double speed;
-    private double size;
-    private double canvasWidth;
-    private double canvasHeight;
-    private Random random;
+    private final double size;
+    private final double canvasWidth;
+    private final double canvasHeight;
+    private final Random random;
 
     // Statistiques de la balle
     private int bounceCount;

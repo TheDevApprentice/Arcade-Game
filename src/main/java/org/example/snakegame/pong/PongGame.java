@@ -1,7 +1,8 @@
 package org.example.snakegame.pong;
 
 import javafx.application.Application;
-import javafx.geometry.Insets;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -10,65 +11,98 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.example.snakegame.GameApplication;
 import org.example.snakegame.GameController;
 import org.example.snakegame.ScoreManager;
+import org.example.snakegame.common.Game;
+import org.example.snakegame.common.GameEventListener;
+import org.example.snakegame.common.GameResult;
+import org.example.snakegame.common.GameLogger;
+import org.example.snakegame.common.TitleBarController;
+
+import java.io.IOException;
 
 /**
  * Jeu Pong - Version corrigée avec synchronisation des boutons
- * Application JavaFX complète pour le jeu de Pong
+ * Application JavaFX complète pour le jeu Pong
+ * Implémente l'interface Game pour respecter l'OCP
  */
-public class PongGame extends Application {
+public class PongGame extends Application implements Game {
 
     // Constantes du jeu
     private static final int CANVAS_WIDTH = 800;
-    private static final int CANVAS_HEIGHT = 600;
 
-    // Composants graphiques
-    private Canvas gameCanvas;
+    // Composants graphiques FXML
+    @FXML private Canvas gameCanvas;
+    @FXML private Label scoreLabel;
+    @FXML private Label bounceLabel;
+    @FXML private Label speedLabel;
+    @FXML private Button startButton;
+    @FXML private Button restartButton;
+    @FXML private Button menuButton;
+    
+    // Title bar FXML
+    @FXML private HBox titleBar;
+    @FXML private Button minimizeButton;
+    @FXML private Button closeButton;
+    
+    // Contrôleur de la title bar
+    private TitleBarController titleBarController;
+    
+    // Composants non-FXML
     private PongController pongController;
-    private Label scoreLabel;
-    private Label bounceLabel;
-    private Label speedLabel;
     private Label statusLabel;
-
-    // CORRIGÉ: Référence au bouton pour synchronisation
-    private Button startButton;
 
     // Référence au gestionnaire de scores
     private ScoreManager scoreManager;
+    private final GameLogger logger = GameLogger.getLogger(PongGame.class);
 
     @Override
     public void start(Stage primaryStage) {
-        // Initialiser le gestionnaire de scores
-        scoreManager = ScoreManager.getInstance();
+        try {
+            // Initialiser le gestionnaire de scores
+            scoreManager = ScoreManager.INSTANCE;
 
-        // Configuration de la fenêtre
-        primaryStage.setTitle("🏓 PONG GAME - Retro Arcade");
+            // Configuration de la fenêtre (ne pas changer le style si déjà visible)
+            primaryStage.setTitle("🏓 PONG GAME - Retro Arcade");
 
-        // Créer l'interface
-        VBox root = createGameInterface();
+            // Charger l'interface FXML avec title bar
+            FXMLLoader fxmlLoader = new FXMLLoader(
+                    getClass().getResource("/org/example/snakegame/views/pong-view-custom-titlebar.fxml"));
+            fxmlLoader.setController(this);
+            VBox root = fxmlLoader.load();
 
-        // Créer la scène
-        Scene scene = new Scene(root, CANVAS_WIDTH + 40, CANVAS_HEIGHT + 160);
+            // Créer la scène avec la hauteur de l'écran
+            int windowHeight = GameApplication.getCanvasHeight();
+            Scene scene = new Scene(root, CANVAS_WIDTH + 40, windowHeight);
 
-        // Charger les styles CSS
-        scene.getStylesheets().addAll(
-                getClass().getResource("/org/example/snakegame/styles/styles.css").toExternalForm(),
-                getClass().getResource("/org/example/snakegame/styles/pong-styles.css").toExternalForm(),
-                getClass().getResource("/org/example/snakegame/styles/menu-styles.css").toExternalForm()
-        );
-
-        // Appliquer les styles
-        root.getStyleClass().add("pong-game-container");
-        gameCanvas.getStyleClass().add("pong-canvas");
+            // Charger les styles CSS
+            scene.getStylesheets().addAll(
+                    getClass().getResource("/org/example/snakegame/styles/styles.css").toExternalForm(),
+                    getClass().getResource("/org/example/snakegame/styles/pong-styles.css").toExternalForm(),
+                    getClass().getResource("/org/example/snakegame/styles/menu-styles.css").toExternalForm()
+            );
+            
+            // Initialiser la title bar
+            initializeTitleBar(primaryStage);
 
         // Créer le contrôleur Pong
         GraphicsContext gc = gameCanvas.getGraphicsContext2D();
         pongController = new PongController(gc);
 
-        // Configurer les callbacks
-        pongController.setScoreUpdateCallback(this::updateScoreDisplay);
-        pongController.setGameOverCallback(this::onGameOver);
+        // Configurer les callbacks avec les nouvelles interfaces
+        pongController.setScoreUpdateListener((newScore, delta) -> updateScoreDisplay());
+        pongController.setGameEventListener(new GameEventListener() {
+            @Override
+            public void onScoreUpdate(int newScore) {
+                updateScoreDisplay();
+            }
+
+            @Override
+            public void onGameOver(GameResult result) {
+                onGameOverEvent(result);
+            }
+        });
 
         // Gestion des touches - CORRIGÉ
         scene.setOnKeyPressed(event -> {
@@ -97,126 +131,79 @@ public class PongGame extends Application {
         // Focus pour les touches
         scene.getRoot().requestFocus();
 
-        // Afficher
-        primaryStage.show();
+            // Afficher
+            primaryStage.show();
 
-        System.out.println("Pong Game lancé avec contrôleur !");
+            logger.info("Pong Game lancé avec contrôleur !");
+        } catch (IOException e) {
+            logger.error("❌ Erreur lors du chargement du FXML Pong: %s", e.getMessage());
+            e.printStackTrace();
+        }
     }
-
+    
     /**
-     * Créer l'interface du jeu
+     * Initialiser la barre de titre custom
      */
-    private VBox createGameInterface() {
-        VBox root = new VBox(10);
-        root.setPadding(new Insets(20));
-        root.setStyle("-fx-alignment: center;");
-
-        // Panneau d'informations en haut
-        HBox infoPanel = createInfoPanel();
-
-        // Canvas de jeu
-        gameCanvas = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
-
-        // Panneau de contrôles en bas
-        HBox controlPanel = createControlPanel();
-
-        // Instructions - CORRIGÉ: Contrôles mis à jour
-        Label instructions = new Label("↑/↓: Joueur 1 | ENTRÉE: Start | ESPACE: Pause | R: Restart | 1/2/3: Difficulté IA | ESC: Menu");
-        instructions.getStyleClass().add("pong-controls");
-
-        root.getChildren().addAll(infoPanel, gameCanvas, controlPanel, instructions);
-
-        return root;
+    private void initializeTitleBar(Stage stage) {
+        if (titleBar != null) {
+            titleBarController = new TitleBarController(stage, titleBar);
+            titleBarController.setOnCloseCallback(() -> {
+                if (pongController != null) {
+                    pongController.stopGame();
+                }
+            });
+            logger.info("✅ Title bar initialisée pour Pong");
+        }
     }
-
+    
     /**
-     * Créer le panneau d'informations
+     * Méthode FXML pour le bouton minimiser
      */
-    private HBox createInfoPanel() {
-        HBox infoPanel = new HBox(30);
-        infoPanel.setStyle("-fx-alignment: center;");
-        infoPanel.getStyleClass().add("pong-info-panel");
-
-        // Score
-        scoreLabel = new Label("JOUEUR 1: 0  |  IA: 0");
-        scoreLabel.getStyleClass().add("pong-player-score");
-
-        // Rebonds
-        bounceLabel = new Label("REBONDS: 0");
-        bounceLabel.getStyleClass().add("pong-bounces");
-
-        // Vitesse de la balle
-        speedLabel = new Label("VITESSE: 3.0");
-        speedLabel.getStyleClass().add("pong-ball-speed");
-
-        infoPanel.getChildren().addAll(scoreLabel, bounceLabel, speedLabel);
-
-        return infoPanel;
+    @FXML
+    protected void onMinimizeButtonClick() {
+        if (titleBarController != null) {
+            titleBarController.minimize();
+        }
     }
-
+    
     /**
-     * Créer le panneau de contrôles - CORRIGÉ
+     * Méthode FXML pour le bouton fermer
      */
-    private HBox createControlPanel() {
-        HBox controlPanel = new HBox(15);
-        controlPanel.setStyle("-fx-alignment: center;");
-
-        // Bouton Start/Pause - CORRIGÉ: Référence stockée
-        startButton = new Button("START");
-        startButton.getStyleClass().addAll("pong-control-button");
-        startButton.setOnAction(e -> handleStartButtonClick());
-
-        // Bouton Restart
-        Button restartButton = new Button("RESTART");
-        restartButton.getStyleClass().addAll("pong-control-button", "pong-restart-button");
-        restartButton.setOnAction(e -> {
-            pongController.restartGame();
-            synchronizeStartButton(); // Synchroniser après restart
-            updateScoreDisplay();
-        });
-
-        // Bouton Menu
-        Button menuButton = new Button("MENU");
-        menuButton.getStyleClass().addAll("pong-control-button", "pong-menu-button");
-        menuButton.setOnAction(e -> returnToMenu());
-
-        // Status
-        statusLabel = new Label("Appuyez sur START pour commencer !");
-        statusLabel.getStyleClass().add("pong-pause");
-
-        controlPanel.getChildren().addAll(startButton, restartButton, menuButton);
-
-        return controlPanel;
+    @FXML
+    protected void onCloseButtonClick() {
+        if (titleBarController != null) {
+            titleBarController.close();
+        }
     }
-
+    
     /**
-     * CORRIGÉ: Gestion du bouton Start avec logique claire
+     * Méthode FXML pour le bouton Start
      */
-    private void handleStartButtonClick() {
+    @FXML
+    protected void handleStartButtonClick() {
         switch (pongController.getGameState()) {
             case WAITING_RESTART -> {
                 pongController.startGame();
                 startButton.setText("PAUSE");
-                System.out.println("Pong: Jeu démarré via bouton");
+                logger.debug("Pong: Jeu démarré via bouton");
             }
             case PLAYING -> {
                 pongController.togglePause();
                 startButton.setText("RESUME");
-                System.out.println("Pong: Jeu mis en pause via bouton");
+                logger.debug("Pong: Jeu mis en pause via bouton");
             }
             case PAUSED -> {
                 pongController.togglePause();
                 startButton.setText("PAUSE");
-                System.out.println("Pong: Jeu repris via bouton");
+                logger.debug("Pong: Jeu repris via bouton");
             }
             case VICTORY -> {
-                // Ne rien faire, utiliser le bouton RESTART à la place
-                System.out.println("Pong: Utiliser RESTART pour rejouer");
+                logger.debug("Pong: Utiliser RESTART pour rejouer");
             }
         }
         updateScoreDisplay();
     }
-
+    
     /**
      * NOUVEAU: Synchroniser le texte du bouton avec l'état du jeu
      */
@@ -233,7 +220,7 @@ public class PongGame extends Application {
     }
 
     /**
-     * Mettre à jour l'affichage des scores et statistiques - CORRIGÉ
+     * Mettre à jour l'affichage des scores et statistiques
      */
     private void updateScoreDisplay() {
         if (pongController != null) {
@@ -246,60 +233,53 @@ public class PongGame extends Application {
                     pongController.getBallSpeed(),
                     (int)(pongController.getAIDifficulty() * 100)));
 
-            // Mettre à jour le statut
-            String status = switch (pongController.getGameState()) {
-                case WAITING_RESTART -> "Appuyez sur START pour commencer ! (Premier à 5 points)";
-                case PLAYING -> String.format("Match en cours... %d-%d | Score global: %s",
-                        pongController.getPlayer1Score(),
-                        pongController.getPlayer2Score(),
-                        scoreManager.getPongScore());
-                case PAUSED -> "JEU EN PAUSE";
-                case VICTORY -> {
-                    String winner = pongController.getPlayer1Score() >= 5 ? "JOUEUR 1" : "IA";
-                    yield winner + " GAGNE ! Score final: " +
-                            pongController.getPlayer1Score() + "-" + pongController.getPlayer2Score() +
-                            " | Score global: " + scoreManager.getPongScore();
-                }
-                default -> "Prêt à jouer !";
-            };
-
-            if (statusLabel != null) {
-                statusLabel.setText(status);
-            }
-
-            // IMPORTANT: Synchroniser le bouton à chaque mise à jour
+            // Synchroniser le bouton
             synchronizeStartButton();
         }
     }
 
     /**
-     * Callback appelé lors de la fin de partie
+     * Callback appelé lors de la fin de partie avec GameResult
      */
-    private void onGameOver() {
+    private void onGameOverEvent(GameResult result) {
         updateScoreDisplay();
-        String winner = pongController.getPlayer1Score() >= 5 ? "Joueur 1" : "IA";
-        System.out.println("Victoire de " + winner + " ! Score: " +
-                pongController.getPlayer1Score() + "-" + pongController.getPlayer2Score());
-        System.out.println("Score global Pong: " + scoreManager.getPongScore());
-
-        // Optionnel: effet sonore, animation, etc.
+        logger.info("Victoire ! Score final: %d", result.getFinalScore());
+        logger.info("Score global Pong: %s", scoreManager.getPongScore());
+        if (result.hasStatistics()) {
+            logger.info("Statistiques: %s", result.getStatistics());
+        }
     }
 
     /**
-     * Retourner au menu principal
+     * Méthode FXML pour le bouton Restart
      */
-    private void returnToMenu() {
-        System.out.println("Retour au menu depuis Pong Game");
-
-        // Arrêter le jeu proprement
+    @FXML
+    protected void handleRestartButtonClick() {
+        pongController.restartGame();
+        synchronizeStartButton();
+        updateScoreDisplay();
+    }
+    
+    /**
+     * Méthode FXML pour le bouton Menu
+     */
+    @FXML
+    protected void returnToMenu() {
+        logger.info("Retour au menu depuis Pong Game");
         if (pongController != null) {
             pongController.stopGame();
         }
-
-        // Retourner au menu
         GameController.returnToMenu();
     }
 
+    /**
+     * Implémentation de l'interface Game
+     */
+    @Override
+    public String getName() {
+        return "Pong";
+    }
+    
     /**
      * Méthode main pour tests indépendants
      */

@@ -11,7 +11,7 @@ import java.util.List;
  */
 public class Snake {
 
-    private List<Point> body;
+    private final List<Point> body;
     private Direction currentDirection;
     private Direction nextDirection;
     private boolean growing;

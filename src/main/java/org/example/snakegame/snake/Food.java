@@ -13,7 +13,7 @@ public class Food {
     private Point position;
     private FoodType type;
     private int value;
-    private Random random;
+    private final Random random;
     private long creationTime;
     private boolean isSpecialFood;
 

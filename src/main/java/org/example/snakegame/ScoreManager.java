@@ -6,14 +6,16 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import org.example.snakegame.common.GameLogger;
 
 /**
  * Gestionnaire global des scores avec sauvegarde persistante locale
- * Singleton qui persiste les scores entre les parties, les jeux et les sessions
+ * Enum Singleton (meilleure pratique Java - thread-safe, protection réflexion/sérialisation)
  */
-public class ScoreManager {
+public enum ScoreManager {
+    INSTANCE;
 
-    private static ScoreManager instance;
+    private final GameLogger logger = GameLogger.getLogger(ScoreManager.class);
 
     // Nom du fichier de sauvegarde
     private static final String SAVE_FILE_NAME = "retro_arcade_scores.dat";
@@ -38,19 +40,9 @@ public class ScoreManager {
     private String lastSessionDate = "";
     private int totalGamesPlayed = 0;
 
-    // Constructeur privé pour Singleton
-    private ScoreManager() {
+    // Constructeur de l'enum (appelé automatiquement une seule fois)
+    ScoreManager() {
         loadScores(); // Charger les scores au démarrage
-    }
-
-    /**
-     * Obtenir l'instance unique du ScoreManager
-     */
-    public static ScoreManager getInstance() {
-        if (instance == null) {
-            instance = new ScoreManager();
-        }
-        return instance;
     }
 
     // === MÉTHODES SNAKE ===
@@ -68,13 +60,13 @@ public class ScoreManager {
         if (score > snakeHighScore) {
             snakeHighScore = score;
             snakeHighScoreDate = getCurrentDateTime();
-            System.out.println("🏆 NOUVEAU HIGH SCORE SNAKE : " + score + " !");
+            logger.game("🏆", "NOUVEAU HIGH SCORE SNAKE : %d !", score);
         }
 
         // Sauvegarder immédiatement
         saveScores();
 
-        System.out.println("Score Snake enregistré: " + score + " | Total: " + snakeTotalScore);
+        logger.info("Score Snake enregistré: %d | Total: %d", score, snakeTotalScore);
     }
 
     public int getSnakeHighScore() { return snakeHighScore; }
@@ -103,7 +95,7 @@ public class ScoreManager {
         // Sauvegarder immédiatement
         saveScores();
 
-        System.out.println("🏆 Victoire Pong enregistrée ! Total: " + pongPlayerWins + "-" + pongAIWins);
+        logger.game("🏆", "Victoire Pong enregistrée ! Total: %d-%d", pongPlayerWins, pongAIWins);
     }
 
     /**
@@ -118,7 +110,7 @@ public class ScoreManager {
         // Sauvegarder immédiatement
         saveScores();
 
-        System.out.println("Défaite Pong enregistrée ! Total: " + pongPlayerWins + "-" + pongAIWins);
+        logger.info("Défaite Pong enregistrée ! Total: %d-%d", pongPlayerWins, pongAIWins);
     }
 
     public String getPongScore() { return pongPlayerWins + "-" + pongAIWins; }
@@ -157,7 +149,7 @@ public class ScoreManager {
         try {
             Files.createDirectories(saveDir);
         } catch (IOException e) {
-            System.err.println("Erreur création répertoire de sauvegarde: " + e.getMessage());
+            logger.error("Erreur création répertoire de sauvegarde: %s", e.getMessage());
             // Fallback: répertoire courant
             saveDir = Paths.get(".");
         }
@@ -179,7 +171,7 @@ public class ScoreManager {
                 try {
                     Files.copy(saveFile, backupFile, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
                 } catch (IOException e) {
-                    System.err.println("Erreur création backup: " + e.getMessage());
+                    logger.error("Erreur création backup: %s", e.getMessage());
                 }
             }
 
@@ -205,10 +197,10 @@ public class ScoreManager {
             // Écrire le fichier
             Files.write(saveFile, content.toString().getBytes());
 
-            System.out.println("💾 Scores sauvegardés dans: " + saveFile.toAbsolutePath());
+            logger.debug("💾 Scores sauvegardés dans: %s", saveFile.toAbsolutePath());
 
         } catch (IOException e) {
-            System.err.println("❌ Erreur sauvegarde scores: " + e.getMessage());
+            logger.error("❌ Erreur sauvegarde scores: %s", e.getMessage());
         }
     }
 
@@ -221,12 +213,12 @@ public class ScoreManager {
             Path saveFile = saveDir.resolve(SAVE_FILE_NAME);
 
             if (!Files.exists(saveFile)) {
-                System.out.println("📁 Aucun fichier de scores trouvé, démarrage avec scores par défaut");
+                logger.info("📁 Aucun fichier de scores trouvé, démarrage avec scores par défaut");
                 initializeDefaultScores();
                 return;
             }
 
-            System.out.println("📖 Chargement des scores depuis: " + saveFile.toAbsolutePath());
+            logger.info("📖 Chargement des scores depuis: %s", saveFile.toAbsolutePath());
 
             // Lire le fichier ligne par ligne
             try (BufferedReader reader = Files.newBufferedReader(saveFile)) {
@@ -236,13 +228,13 @@ public class ScoreManager {
                 }
             }
 
-            System.out.println("✅ Scores chargés avec succès !");
-            System.out.println("   Snake High Score: " + snakeHighScore);
-            System.out.println("   Pong Score: " + getPongScore());
-            System.out.println("   Total parties: " + totalGamesPlayed);
+            logger.info("✅ Scores chargés avec succès !");
+            logger.info("   Snake High Score: %d", snakeHighScore);
+            logger.info("   Pong Score: %s", getPongScore());
+            logger.info("   Total parties: %d", totalGamesPlayed);
 
         } catch (IOException e) {
-            System.err.println("❌ Erreur chargement scores: " + e.getMessage());
+            logger.error("❌ Erreur chargement scores: %s", e.getMessage());
 
             // Essayer de charger le backup
             tryLoadBackup();
@@ -258,7 +250,7 @@ public class ScoreManager {
             Path backupFile = saveDir.resolve(BACKUP_FILE_NAME);
 
             if (Files.exists(backupFile)) {
-                System.out.println("🔄 Tentative de chargement du backup...");
+                logger.info("🔄 Tentative de chargement du backup...");
 
                 try (BufferedReader reader = Files.newBufferedReader(backupFile)) {
                     String line;
@@ -267,17 +259,17 @@ public class ScoreManager {
                     }
                 }
 
-                System.out.println("✅ Backup chargé avec succès !");
+                logger.info("✅ Backup chargé avec succès !");
                 // Sauvegarder immédiatement pour restaurer le fichier principal
                 saveScores();
 
             } else {
-                System.out.println("❌ Aucun backup trouvé, initialisation par défaut");
+                logger.info("❌ Aucun backup trouvé, initialisation par défaut");
                 initializeDefaultScores();
             }
 
         } catch (IOException e) {
-            System.err.println("❌ Erreur chargement backup: " + e.getMessage());
+            logger.error("❌ Erreur chargement backup: %s", e.getMessage());
             initializeDefaultScores();
         }
     }
@@ -317,7 +309,7 @@ public class ScoreManager {
                 case "pong.lastWinDate" -> pongLastWinDate = value;
             }
         } catch (NumberFormatException e) {
-            System.err.println("⚠️ Erreur parsing ligne: " + line);
+            logger.warn("⚠️ Erreur parsing ligne: %s", line);
         }
     }
 
@@ -362,7 +354,7 @@ public class ScoreManager {
         pongCurrentSessionWins = 0;
         lastSessionDate = getCurrentDateTime();
 
-        System.out.println("🔄 Scores de session réinitialisés");
+        logger.info("🔄 Scores de session réinitialisés");
     }
 
     /**
@@ -374,7 +366,7 @@ public class ScoreManager {
 
         initializeDefaultScores();
 
-        System.out.println("🗑️ Tous les scores ont été réinitialisés !");
+        logger.info("🗑️ Tous les scores ont été réinitialisés !");
     }
 
     /**
@@ -389,10 +381,10 @@ public class ScoreManager {
                 String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
                 Path manualBackup = saveDir.resolve("retro_arcade_scores_backup_" + timestamp + ".dat");
                 Files.copy(saveFile, manualBackup);
-                System.out.println("💾 Backup manuel créé: " + manualBackup.getFileName());
+                logger.info("💾 Backup manuel créé: %s", manualBackup.getFileName());
             }
         } catch (IOException e) {
-            System.err.println("❌ Erreur création backup manuel: " + e.getMessage());
+            logger.error("❌ Erreur création backup manuel: %s", e.getMessage());
         }
     }
 
@@ -435,10 +427,10 @@ public class ScoreManager {
                     .append(", Pong +").append(pongCurrentSessionWins).append("\n");
 
             Files.write(exportFile, export.toString().getBytes());
-            System.out.println("📄 Scores exportés vers: " + exportFile.toAbsolutePath());
+            logger.info("📄 Scores exportés vers: %s", exportFile.toAbsolutePath());
 
         } catch (IOException e) {
-            System.err.println("❌ Erreur export scores: " + e.getMessage());
+            logger.error("❌ Erreur export scores: %s", e.getMessage());
         }
     }
 
@@ -462,7 +454,7 @@ public class ScoreManager {
      */
     public void forceSave() {
         saveScores();
-        System.out.println("💾 Sauvegarde forcée des scores");
+        logger.info("💾 Sauvegarde forcée des scores");
     }
 
     // === GETTERS SUPPLÉMENTAIRES ===
