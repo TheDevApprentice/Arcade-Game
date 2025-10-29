@@ -19,11 +19,11 @@ public class GameResult {
      * Constructeur complet
      */
     public GameResult(String gameName, int finalScore, boolean isVictory, GameStatistics statistics) {
-        this.gameName = Objects.requireNonNull(gameName, "Game name cannot be null");
-        this.finalScore = finalScore;
+        this.gameName = ValidationUtils.requireNonEmpty(gameName, "gameName");
+        this.finalScore = ValidationUtils.requireNonNegative(finalScore, "finalScore");
         this.isVictory = isVictory;
         this.timestamp = LocalDateTime.now();
-        this.statistics = statistics;
+        this.statistics = statistics; // null autorisé pour parties simples
     }
 
     /**
@@ -78,9 +78,9 @@ public class GameResult {
         private final String additionalInfo;
 
         public GameStatistics(int duration, int maxCombo, String additionalInfo) {
-            this.duration = duration;
-            this.maxCombo = maxCombo;
-            this.additionalInfo = additionalInfo;
+            this.duration = ValidationUtils.requireNonNegative(duration, "duration");
+            this.maxCombo = ValidationUtils.requireNonNegative(maxCombo, "maxCombo");
+            this.additionalInfo = additionalInfo; // null autorisé
         }
 
         public int getDuration() { return duration; }
