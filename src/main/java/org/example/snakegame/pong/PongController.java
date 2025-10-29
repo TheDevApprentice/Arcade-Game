@@ -32,8 +32,7 @@ public class PongController extends AbstractGameController {
     private static final int BALL_SIZE = 15;
     private static final int WINNING_SCORE = 5;
 
-    // État du jeu (gameState est dans AbstractGameController)
-    private Timeline gameLoop;
+    // État du jeu (gameState et gameLoop sont dans AbstractGameController)
     private final GraphicsContext gc;
     
     // Renderer dédié (SRP)

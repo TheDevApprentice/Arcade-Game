@@ -29,8 +29,7 @@ public class SnakeController extends AbstractGameController {
     private static final int BOARD_HEIGHT = 30; // 600px / 20px
     private static final int INITIAL_GAME_SPEED = 120; // Réduit pour plus de fluidité
 
-    // État du jeu (gameState est dans AbstractGameController)
-    private Timeline gameLoop;
+    // État du jeu (gameState et gameLoop sont dans AbstractGameController)
     private final GraphicsContext gc;
     
     // Renderer dédié (SRP)
