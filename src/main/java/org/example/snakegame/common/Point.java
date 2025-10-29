@@ -5,6 +5,10 @@ import java.util.Objects;
 /**
  * Classe représentant une position (x, y) sur la grille de jeu
  * Utilisée pour les segments du serpent, la nourriture, et les éléments de Pong
+ * 
+ * Note: Les champs x et y sont publics ET final (immuable)
+ * C'est un compromis acceptable pour la performance et la simplicité
+ * Des getters sont fournis pour une meilleure encapsulation future
  */
 public class Point {
     public final int x;
@@ -18,6 +22,22 @@ public class Point {
     public Point(int x, int y) {
         this.x = x;
         this.y = y;
+    }
+    
+    /**
+     * Obtenir la coordonnée X
+     * @return Coordonnée X
+     */
+    public int getX() {
+        return x;
+    }
+    
+    /**
+     * Obtenir la coordonnée Y
+     * @return Coordonnée Y
+     */
+    public int getY() {
+        return y;
     }
 
     /**
