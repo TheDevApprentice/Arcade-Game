@@ -12,15 +12,18 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.example.snakegame.GameController;
 import org.example.snakegame.ScoreManager;
+import org.example.snakegame.common.Game;
 import org.example.snakegame.common.GameEventListener;
 import org.example.snakegame.common.GameResult;
 import org.example.snakegame.common.GameLogger;
+import org.example.snakegame.common.GameState;
 
 /**
  * Jeu Snake - Version corrigée avec synchronisation des boutons
  * Application JavaFX complète pour le jeu du serpent
+ * Implémente l'interface Game pour respecter l'OCP
  */
-public class SnakeGame extends Application {
+public class SnakeGame extends Application implements Game {
 
     // Constantes du jeu
     private static final int CANVAS_WIDTH = 800;
@@ -318,6 +321,14 @@ public class SnakeGame extends Application {
         GameController.returnToMenu();
     }
 
+    /**
+     * Implémentation de l'interface Game
+     */
+    @Override
+    public String getName() {
+        return "Snake";
+    }
+    
     /**
      * Méthode main pour tests indépendants
      */

@@ -12,15 +12,18 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.example.snakegame.GameController;
 import org.example.snakegame.ScoreManager;
+import org.example.snakegame.common.Game;
 import org.example.snakegame.common.GameEventListener;
 import org.example.snakegame.common.GameResult;
 import org.example.snakegame.common.GameLogger;
+import org.example.snakegame.common.GameState;
 
 /**
  * Jeu Pong - Version corrigée avec synchronisation des boutons
- * Application JavaFX complète pour le jeu de Pong
+ * Application JavaFX complète pour le jeu Pong
+ * Implémente l'interface Game pour respecter l'OCP
  */
-public class PongGame extends Application {
+public class PongGame extends Application implements Game {
 
     // Constantes du jeu
     private static final int CANVAS_WIDTH = 800;
@@ -313,6 +316,14 @@ public class PongGame extends Application {
         GameController.returnToMenu();
     }
 
+    /**
+     * Implémentation de l'interface Game
+     */
+    @Override
+    public String getName() {
+        return "Pong";
+    }
+    
     /**
      * Méthode main pour tests indépendants
      */
