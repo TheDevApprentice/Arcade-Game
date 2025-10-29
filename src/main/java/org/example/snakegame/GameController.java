@@ -5,19 +5,20 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import org.example.snakegame.snake.SnakeGame;
 import org.example.snakegame.pong.PongGame;
 import org.example.snakegame.common.GameLogger;
+import org.example.snakegame.common.TitleBarController;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
 /**
- * Contrôleur du menu principal avec barre de titre custom
- * Gère les interactions utilisateur, barre de titre et affiche les scores globaux
+ * Contrôleur du menu principal
+ * Gère les interactions utilisateur et affiche les scores globaux
+ * La gestion de la barre de titre est déléguée à TitleBarController (SRP)
  */
 public class GameController implements Initializable {
 
@@ -35,9 +36,8 @@ public class GameController implements Initializable {
     @FXML private Button minimizeButton;
     @FXML private Button closeButton;
 
-    // Variables pour le drag & drop de la fenêtre
-    private double xOffset = 0;
-    private double yOffset = 0;
+    // Contrôleur dédié à la barre de titre (SRP)
+    private TitleBarController titleBarController;
 
     // Référence au gestionnaire de scores global
     private ScoreManager scoreManager;
@@ -56,11 +56,11 @@ public class GameController implements Initializable {
         // Ajouter des effets sonores aux boutons (optionnel)
         setupButtonEffects();
 
-        // NOUVEAU: Configurer la barre de titre draggable
-        setupCustomTitleBar();
+        // Initialiser le contrôleur de la barre de titre (SRP)
+        initializeTitleBarController();
 
         // Afficher des informations de debug
-        logger.info("🎮 Menu principal initialisé avec ScoreManager et barre de titre custom");
+        logger.info("🎮 Menu principal initialisé avec ScoreManager");
         logger.info("📁 %s", getSaveFileInfo());
         logger.info("📊 %s", getSessionStats());
 
@@ -71,65 +71,51 @@ public class GameController implements Initializable {
     }
 
     /**
-     * NOUVEAU: Configurer la barre de titre pour le drag & drop
+     * Initialiser le contrôleur de la barre de titre
+     * Délégation de responsabilité (SRP)
      */
-    private void setupCustomTitleBar() {
+    private void initializeTitleBarController() {
         if (titleBar != null) {
-            // Gérer le début du drag
-            titleBar.setOnMousePressed((MouseEvent event) -> {
-                xOffset = event.getSceneX();
-                yOffset = event.getSceneY();
-            });
-
-            // Gérer le déplacement de la fenêtre
-            titleBar.setOnMouseDragged((MouseEvent event) -> {
-                Stage stage = GameApplication.getPrimaryStage();
-                if (stage != null) {
-                    stage.setX(event.getScreenX() - xOffset);
-                    stage.setY(event.getScreenY() - yOffset);
-                }
-            });
-
-            // Changer le curseur au survol
-            titleBar.setOnMouseEntered(e -> titleBar.setStyle(titleBar.getStyle() + "-fx-cursor: move;"));
-            titleBar.setOnMouseExited(e -> titleBar.setStyle(titleBar.getStyle().replace("-fx-cursor: move;", "")));
-
-            logger.debug("✅ Barre de titre draggable configurée");
+            Stage stage = GameApplication.getPrimaryStage();
+            if (stage != null) {
+                titleBarController = new TitleBarController(stage, titleBar);
+                
+                // Définir le callback de fermeture
+                titleBarController.setOnCloseCallback(() -> {
+                    // Afficher un résumé final des scores
+                    logger.info("=== SCORES FINAUX ===");
+                    logger.info("%s", scoreManager.getScoreSummary());
+                    
+                    // Nettoyer l'audio
+                    MusicController.getInstance().cleanup();
+                    
+                    // Forcer la sauvegarde des scores
+                    scoreManager.forceSave();
+                });
+                
+                logger.info("✅ TitleBarController initialisé");
+            }
         }
     }
 
     /**
-     * NOUVEAU: Action du bouton minimiser
+     * Action du bouton minimiser - Délégation au TitleBarController
      */
     @FXML
     protected void onMinimizeButtonClick() {
-        Stage stage = GameApplication.getPrimaryStage();
-        if (stage != null) {
-            stage.setIconified(true);
-            logger.debug("📦 Fenêtre minimisée");
+        if (titleBarController != null) {
+            titleBarController.minimize();
         }
     }
 
     /**
-     * NOUVEAU: Action du bouton fermer
+     * Action du bouton fermer - Délégation au TitleBarController
      */
     @FXML
     protected void onCloseButtonClick() {
-        logger.info("❌ Fermeture de l'application via barre de titre...");
-
-        // Afficher un résumé final des scores
-        logger.info("=== SCORES FINAUX ===");
-        logger.info("%s", scoreManager.getScoreSummary());
-
-        // Nettoyer l'audio
-        MusicController.getInstance().cleanup();
-
-        // Forcer la sauvegarde des scores
-        scoreManager.forceSave();
-
-        // Fermer l'application proprement
-        Platform.exit();
-        System.exit(0);
+        if (titleBarController != null) {
+            titleBarController.close();
+        }
     }
 
     /**
