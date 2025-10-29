@@ -24,8 +24,8 @@ public class MusicController {
     private MediaPlayer currentMusicPlayer;
 
     // Map pour stocker tous les sons chargés
-    private Map<SoundEffect, MediaPlayer> soundEffects;
-    private Map<BackgroundMusic, MediaPlayer> backgroundMusics;
+    private final Map<SoundEffect, MediaPlayer> soundEffects;
+    private final Map<BackgroundMusic, MediaPlayer> backgroundMusics;
 
     // Configuration audio
     private double masterVolume = 0.7;

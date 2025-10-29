@@ -16,7 +16,6 @@ import org.example.snakegame.common.Game;
 import org.example.snakegame.common.GameEventListener;
 import org.example.snakegame.common.GameResult;
 import org.example.snakegame.common.GameLogger;
-import org.example.snakegame.common.GameState;
 
 /**
  * Jeu Pong - Version corrigée avec synchronisation des boutons

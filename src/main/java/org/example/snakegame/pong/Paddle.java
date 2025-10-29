@@ -7,12 +7,12 @@ public class Paddle {
 
     private double x;
     private double y;
-    private double width;
-    private double height;
+    private final double width;
+    private final double height;
     private double speed;
-    private double canvasHeight;
-    private boolean isAI;
-    private PaddleType type;
+    private final double canvasHeight;
+    private final boolean isAI;
+    private final PaddleType type;
 
     // IA Properties
     private double aiDifficulty;

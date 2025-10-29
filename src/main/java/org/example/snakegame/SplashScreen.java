@@ -37,7 +37,7 @@ public class SplashScreen {
     // Étapes de chargement simulées
     private List<LoadingStep> loadingSteps;
     private int currentStep = 0;
-    private Random random = new Random();
+    private final Random random = new Random();
 
     /**
      * Étape de chargement avec message et durée
