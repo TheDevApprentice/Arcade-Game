@@ -33,7 +33,7 @@ public class SnakeGame extends Application implements Game {
 
     // Constantes du jeu
     private static final int CANVAS_WIDTH = 800;
-    private static final int CANVAS_HEIGHT = 600;
+
 
     // Composants graphiques FXML
     @FXML private Canvas gameCanvas;
@@ -77,8 +77,9 @@ public class SnakeGame extends Application implements Game {
             fxmlLoader.setController(this);
             VBox root = fxmlLoader.load();
 
-            // Créer la scène
-            Scene scene = new Scene(root, CANVAS_WIDTH + 40, CANVAS_HEIGHT + 200);
+            // Créer la scène avec la hauteur de l'écran
+            int windowHeight = GameApplication.getCanvasHeight();
+            Scene scene = new Scene(root, CANVAS_WIDTH + 40, windowHeight);
 
             // Charger les styles CSS
             scene.getStylesheets().addAll(

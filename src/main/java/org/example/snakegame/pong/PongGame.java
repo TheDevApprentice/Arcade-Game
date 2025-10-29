@@ -3,7 +3,6 @@ package org.example.snakegame.pong;
 import javafx.application.Application;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Insets;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
@@ -12,7 +11,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import org.example.snakegame.GameApplication;
 import org.example.snakegame.GameController;
 import org.example.snakegame.ScoreManager;
 import org.example.snakegame.common.Game;
@@ -32,7 +31,6 @@ public class PongGame extends Application implements Game {
 
     // Constantes du jeu
     private static final int CANVAS_WIDTH = 800;
-    private static final int CANVAS_HEIGHT = 600;
 
     // Composants graphiques FXML
     @FXML private Canvas gameCanvas;
@@ -74,8 +72,9 @@ public class PongGame extends Application implements Game {
             fxmlLoader.setController(this);
             VBox root = fxmlLoader.load();
 
-            // Créer la scène
-            Scene scene = new Scene(root, CANVAS_WIDTH + 40, CANVAS_HEIGHT + 200);
+            // Créer la scène avec la hauteur de l'écran
+            int windowHeight = GameApplication.getCanvasHeight();
+            Scene scene = new Scene(root, CANVAS_WIDTH + 40, windowHeight);
 
             // Charger les styles CSS
             scene.getStylesheets().addAll(
