@@ -35,7 +35,7 @@ public class SnakeController extends AbstractGameController {
     private static final int MIN_GAME_SPEED = 60; // Vitesse minimale (= vitesse max)
 
     // État du jeu (gameState et gameLoop sont dans AbstractGameController)
-    private final GraphicsContext gc;
+    // GraphicsContext passé uniquement au renderer (SRP)
     
     // Renderer dédié (SRP)
     private final SnakeRenderer renderer;
@@ -58,7 +58,7 @@ public class SnakeController extends AbstractGameController {
      */
     public SnakeController(GraphicsContext gc) {
         super(SnakeController.class);
-        this.gc = ValidationUtils.requireNonNull(gc, "graphicsContext");
+        ValidationUtils.requireNonNull(gc, "graphicsContext");
         this.renderer = new SnakeRenderer(gc, CELL_SIZE, BOARD_WIDTH, BOARD_HEIGHT);
         this.scoreManager = ScoreManager.getInstance();
         this.musicController = MusicController.getInstance();
