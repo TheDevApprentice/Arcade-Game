@@ -5,7 +5,7 @@ Ce dossier contient les workflows d'automatisation pour le projet Retro Arcade.
 ## 📁 Fichiers disponibles
 
 ### `build-windows.yml`
-- **Déclencheur**: Push sur branche `feature`, Pull Request, manuel
+- **Déclencheur**: Push sur branche `features`, Pull Request, manuel
 - **OS**: Windows Latest
 - **Actions**: 
   - Build Maven avec cache
@@ -18,11 +18,11 @@ Ce dossier contient les workflows d'automatisation pour le projet Retro Arcade.
 
 ### Build automatique
 ```bash
-# Push sur la branche feature
-git checkout feature
+# Push sur la branche features
+git checkout features
 git add .
 git commit -m "feat: nouvelle fonctionnalité"
-git push origin feature
+git push origin features
 ```
 
 ### Build manuel

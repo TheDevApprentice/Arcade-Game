@@ -16,13 +16,13 @@ jobs:
       uses: actions/checkout@v4
       
     - name: Setup JDK 17
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
         
     - name: Cache Maven dependencies
-      uses: actions/cache@v3
+      uses: actions/cache@v4
       with:
         path: ~/.m2
         key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
@@ -84,13 +84,13 @@ jobs:
         7z a -tzip ../RetroArcade-Windows.zip *
         
     - name: Upload executable as artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: RetroArcade-Windows-Executable
         path: target/dist/*.exe
         
     - name: Upload ZIP package as artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: RetroArcade-Windows-Package
         path: target/RetroArcade-Windows.zip

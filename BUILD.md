@@ -41,14 +41,14 @@ jpackage --name "RetroArcade" ^
 ## 🔄 Build Automatique (CI/CD)
 
 ### GitHub Actions
-Le build automatique est déclenché lors d'un push sur la branche `feature`:
+Le build automatique est déclenché lors d'un push sur la branche `features`:
 
 1. **Push votre code**
 ```bash
-git checkout feature
+git checkout features
 git add .
 git commit -m "feat: new feature"
-git push origin feature
+git push origin features
 ```
 
 2. **Télécharger les artefacts**

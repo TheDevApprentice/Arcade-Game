@@ -572,7 +572,13 @@ Les contributions sont les bienvenues ! Voici comment participer:
 1. **Fork** le projet
 2. **Créer une branche** (`git checkout -b feature/AmazingFeature`)
 3. **Commit** vos changements (`git commit -m 'Add AmazingFeature'`)
-4. **Push** vers la branche (`git push origin feature/AmazingFeature`)
+4. **Push sur la branche `features`**
+```bash
+git checkout features
+git add .
+git commit -m "feat: nouvelle fonctionnalité"
+git push origin features
+```
 5. **Ouvrir une Pull Request**
 
 ### Guidelines
