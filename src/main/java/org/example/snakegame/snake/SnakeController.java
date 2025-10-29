@@ -319,56 +319,19 @@ public class SnakeController extends AbstractGameController {
         }
     }
 
-    /**
-     * Démarrer le jeu - CORRIGÉ
-     */
-    public void startGame() {
-        if (gameState == GameState.WAITING_RESTART) {
-            updateGameState(GameState.PLAYING);
-            gameLoop.play();
-            logger.game("▶️", "Snake démarré");
-        }
+    @Override
+    protected String getGameName() {
+        return "Snake";
     }
 
-    /**
-     * Basculer pause/play
-     */
-    public void togglePause() {
-        if (gameState == GameState.PLAYING) {
-            updateGameState(GameState.PAUSED);
-            if (gameLoop != null) {
-                gameLoop.pause();
-            }
-            logger.game("⏸️", "Snake en pause");
-        } else if (gameState == GameState.PAUSED) {
-            updateGameState(GameState.PLAYING);
-            if (gameLoop != null) {
-                gameLoop.play();
-            }
-            logger.game("▶️", "Snake repris");
-        }
-        render();
-    }
-
-    /**
-     * Redémarrer le jeu
-     */
-    public void restartGame() {
-        if (gameLoop != null) {
-            gameLoop.stop();
-        }
+    @Override
+    protected void onRestart() {
         initializeGame();
-        logger.game("🔄", "Snake redémarré");
     }
 
-    /**
-     * Arrêter le jeu
-     */
-    public void stopGame() {
-        if (gameLoop != null) {
-            gameLoop.stop();
-        }
-        updateGameState(GameState.WAITING_RESTART);
+    @Override
+    protected void onPauseToggled() {
+        render(); // Rafraîchir l'affichage lors de la pause
     }
 
     /**

@@ -300,40 +300,19 @@ public class PongController extends AbstractGameController {
         pressedKeys.remove(keyCode);
     }
 
-    public void startGame() {
-        if (gameState == GameState.WAITING_RESTART) {
-            updateGameState(GameState.PLAYING);
-            gameLoop.play();
-            logger.game("▶️", "Pong démarré");
-        }
+    @Override
+    protected String getGameName() {
+        return "Pong";
     }
 
-    public void togglePause() {
-        if (gameState == GameState.PLAYING) {
-            updateGameState(GameState.PAUSED);
-            gameLoop.pause();
-            logger.game("⏸️", "Pong en pause");
-        } else if (gameState == GameState.PAUSED) {
-            updateGameState(GameState.PLAYING);
-            gameLoop.play();
-            logger.game("▶️", "Pong repris");
-        }
-        render();
-    }
-
-    public void restartGame() {
-        if (gameLoop != null) {
-            gameLoop.stop();
-        }
+    @Override
+    protected void onRestart() {
         initializeGame();
-        logger.game("🔄", "Pong redémarré");
     }
 
-    public void stopGame() {
-        if (gameLoop != null) {
-            gameLoop.stop();
-        }
-        updateGameState(GameState.WAITING_RESTART);
+    @Override
+    protected void onPauseToggled() {
+        render(); // Rafraîchir l'affichage lors de la pause
     }
 
     /**
