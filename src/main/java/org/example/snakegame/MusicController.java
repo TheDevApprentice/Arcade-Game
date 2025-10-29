@@ -3,6 +3,7 @@ package org.example.snakegame;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.util.Duration;
+import org.example.snakegame.common.GameLogger;
 
 import java.net.URL;
 import java.util.HashMap;
@@ -11,10 +12,12 @@ import java.util.Map;
 /**
  * Gestionnaire global de la musique et des effets sonores
  * Singleton qui gère tous les assets audio du jeu Retro Arcade
+ * Version refactorisée avec logging structuré
  */
 public class MusicController {
 
     private static MusicController instance;
+    private final GameLogger logger;
 
     // MediaPlayers pour la musique d'ambiance (en boucle)
     private MediaPlayer backgroundMusicPlayer;
@@ -94,6 +97,7 @@ public class MusicController {
      * Constructeur privé pour Singleton
      */
     private MusicController() {
+        this.logger = GameLogger.getLogger(MusicController.class);
         soundEffects = new HashMap<>();
         backgroundMusics = new HashMap<>();
     }
@@ -117,11 +121,11 @@ public class MusicController {
      */
     public void initialize() {
         if (isInitialized) {
-            System.out.println("🎵 MusicController déjà initialisé");
+            logger.info("🎵 MusicController déjà initialisé");
             return;
         }
 
-        System.out.println("🎵 Initialisation du MusicController...");
+        logger.info("🎵 Initialisation du MusicController...");
 
         try {
             // Charger toutes les musiques d'ambiance
@@ -131,13 +135,12 @@ public class MusicController {
             loadSoundEffects();
 
             isInitialized = true;
-            System.out.println("✅ MusicController initialisé avec succès !");
-            System.out.println("   - " + backgroundMusics.size() + " musiques d'ambiance chargées");
-            System.out.println("   - " + soundEffects.size() + " effets sonores chargés");
+            logger.info("✅ MusicController initialisé avec succès !");
+            logger.info("   - %d musiques d'ambiance chargées", backgroundMusics.size());
+            logger.info("   - %d effets sonores chargés", soundEffects.size());
 
         } catch (Exception e) {
-            System.err.println("❌ Erreur lors de l'initialisation du MusicController: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("❌ Erreur lors de l'initialisation du MusicController: %s", e.getMessage());
         }
     }
 
@@ -158,16 +161,16 @@ public class MusicController {
 
                     // Gérer les erreurs de chargement média
                     player.setOnError(() -> {
-                        System.err.println("❌ Erreur de lecture pour " + music.getFilename() + ": " + player.getError().getMessage());
+                        logger.error("❌ Erreur de lecture pour %s: %s", music.getFilename(), player.getError().getMessage());
                     });
 
                     backgroundMusics.put(music, player);
-                    System.out.println("🎼 Musique chargée: " + music.getDescription());
+                    logger.debug("🎼 Musique chargée: %s", music.getDescription());
                 } else {
-                    System.err.println("⚠️ Fichier musical introuvable: " + music.getFilename());
+                    logger.warn("⚠️ Fichier musical introuvable: %s", music.getFilename());
                 }
             } catch (Exception e) {
-                System.err.println("❌ Erreur chargement musique " + music.getFilename() + ": " + e.getMessage());
+                logger.error("❌ Erreur chargement musique %s: %s", music.getFilename(), e.getMessage());
                 // Continue avec les autres fichiers même si un échoue
             }
         }
@@ -189,12 +192,12 @@ public class MusicController {
                     player.setVolume(sfxVolume * masterVolume);
 
                     soundEffects.put(sfx, player);
-                    System.out.println("🔊 SFX chargé: " + sfx.getDescription());
+                    logger.debug("🔊 SFX chargé: %s", sfx.getDescription());
                 } else {
-                    System.err.println("⚠️ Fichier SFX introuvable: " + sfx.getFilename());
+                    logger.warn("⚠️ Fichier SFX introuvable: %s", sfx.getFilename());
                 }
             } catch (Exception e) {
-                System.err.println("❌ Erreur chargement SFX " + sfx.getFilename() + ": " + e.getMessage());
+                logger.error("❌ Erreur chargement SFX %s: %s", sfx.getFilename(), e.getMessage());
             }
         }
     }
@@ -220,19 +223,19 @@ public class MusicController {
                     player.play();
                     currentMusicPlayer = player;
                     currentMusic = music;
-                    System.out.println("🎵 Musique démarrée: " + music.getDescription());
+                    logger.info("🎵 Musique démarrée: %s", music.getDescription());
                 } else {
-                    System.err.println("❌ Impossible de jouer " + music.getDescription() + " - Fichier défectueux");
+                    logger.error("❌ Impossible de jouer %s - Fichier défectueux", music.getDescription());
                     // Essayer une musique de secours
                     tryFallbackMusic();
                 }
             } else {
-                System.err.println("❌ Musique non trouvée: " + music);
+                logger.error("❌ Musique non trouvée: %s", music);
                 // Essayer une musique de secours
                 tryFallbackMusic();
             }
         } catch (Exception e) {
-            System.err.println("❌ Erreur lecture musique: " + e.getMessage());
+            logger.error("❌ Erreur lecture musique: %s", e.getMessage());
             tryFallbackMusic();
         }
     }
@@ -249,14 +252,14 @@ public class MusicController {
                     player.play();
                     currentMusicPlayer = player;
                     currentMusic = fallback;
-                    System.out.println("🎵 Musique de secours: " + fallback.getDescription());
+                    logger.info("🎵 Musique de secours: %s", fallback.getDescription());
                     return;
                 } catch (Exception e) {
                     // Continue vers le prochain
                 }
             }
         }
-        System.err.println("❌ Aucune musique fonctionnelle trouvée");
+        logger.error("❌ Aucune musique fonctionnelle trouvée");
     }
 
     /**
@@ -265,7 +268,7 @@ public class MusicController {
     public void stopBackgroundMusic() {
         if (currentMusicPlayer != null) {
             currentMusicPlayer.stop();
-            System.out.println("⏹️ Musique arrêtée: " + (currentMusic != null ? currentMusic.getDescription() : "Inconnue"));
+            logger.debug("⏹️ Musique arrêtée: %s", (currentMusic != null ? currentMusic.getDescription() : "Inconnue"));
         }
         currentMusicPlayer = null;
         currentMusic = null;
@@ -278,10 +281,10 @@ public class MusicController {
         if (currentMusicPlayer != null) {
             if (currentMusicPlayer.getStatus() == MediaPlayer.Status.PLAYING) {
                 currentMusicPlayer.pause();
-                System.out.println("⏸️ Musique mise en pause");
+                logger.debug("⏸️ Musique mise en pause");
             } else if (currentMusicPlayer.getStatus() == MediaPlayer.Status.PAUSED) {
                 currentMusicPlayer.play();
-                System.out.println("▶️ Musique reprise");
+                logger.debug("▶️ Musique reprise");
             }
         }
     }
@@ -305,12 +308,12 @@ public class MusicController {
                 player.setVolume(sfxVolume * masterVolume);
                 player.play();
 
-                System.out.println("🔊 SFX joué: " + effect.getDescription());
+                logger.debug("🔊 SFX joué: %s", effect.getDescription());
             } else {
-                System.err.println("❌ Effet sonore non trouvé: " + effect);
+                logger.error("❌ Effet sonore non trouvé: %s", effect);
             }
         } catch (Exception e) {
-            System.err.println("❌ Erreur lecture SFX: " + e.getMessage());
+            logger.error("❌ Erreur lecture SFX: %s", e.getMessage());
         }
     }
 
@@ -320,7 +323,7 @@ public class MusicController {
     public void setMasterVolume(double volume) {
         this.masterVolume = Math.max(0.0, Math.min(1.0, volume));
         updateAllVolumes();
-        System.out.println("🔊 Volume principal: " + (int)(masterVolume * 100) + "%");
+        logger.info("🔊 Volume principal: %d%%", (int)(masterVolume * 100));
     }
 
     /**
@@ -329,7 +332,7 @@ public class MusicController {
     public void setMusicVolume(double volume) {
         this.musicVolume = Math.max(0.0, Math.min(1.0, volume));
         updateMusicVolume();
-        System.out.println("🎵 Volume musique: " + (int)(musicVolume * 100) + "%");
+        logger.info("🎵 Volume musique: %d%%", (int)(musicVolume * 100));
     }
 
     /**
@@ -338,7 +341,7 @@ public class MusicController {
     public void setSFXVolume(double volume) {
         this.sfxVolume = Math.max(0.0, Math.min(1.0, volume));
         updateSFXVolume();
-        System.out.println("🔊 Volume SFX: " + (int)(sfxVolume * 100) + "%");
+        logger.info("🔊 Volume SFX: %d%%", (int)(sfxVolume * 100));
     }
 
     /**
@@ -348,12 +351,12 @@ public class MusicController {
         this.isMuted = muted;
         if (muted) {
             pauseBackgroundMusic();
-            System.out.println("🔇 Audio désactivé");
+            logger.info("🔇 Audio désactivé");
         } else {
             if (currentMusic != null && isMusicEnabled) {
                 playBackgroundMusic(currentMusic);
             }
-            System.out.println("🔊 Audio activé");
+            logger.info("🔊 Audio activé");
         }
     }
 
@@ -364,11 +367,11 @@ public class MusicController {
         this.isMusicEnabled = enabled;
         if (!enabled) {
             stopBackgroundMusic();
-            System.out.println("🎵 Musique désactivée");
+            logger.info("🎵 Musique désactivée");
         } else if (!isMuted) {
             // Redémarrer la musique du menu par défaut
             playBackgroundMusic(BackgroundMusic.MENU);
-            System.out.println("🎵 Musique activée");
+            logger.info("🎵 Musique activée");
         }
     }
 
@@ -377,7 +380,7 @@ public class MusicController {
      */
     public void setSFXEnabled(boolean enabled) {
         this.areSFXEnabled = enabled;
-        System.out.println("🔊 Effets sonores " + (enabled ? "activés" : "désactivés"));
+        logger.info("🔊 Effets sonores %s", (enabled ? "activés" : "désactivés"));
     }
 
     /**
@@ -410,7 +413,7 @@ public class MusicController {
      * Nettoyer les ressources (à appeler à la fermeture)
      */
     public void cleanup() {
-        System.out.println("🧹 Nettoyage du MusicController...");
+        logger.info("🧹 Nettoyage du MusicController...");
 
         // Arrêter et libérer la musique d'ambiance
         stopBackgroundMusic();
@@ -427,7 +430,7 @@ public class MusicController {
         soundEffects.clear();
         isInitialized = false;
 
-        System.out.println("✅ MusicController nettoyé");
+        logger.info("✅ MusicController nettoyé");
     }
 
     // === MÉTHODES DE CONVENANCE POUR LES JEUX ===

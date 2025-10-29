@@ -14,6 +14,7 @@ import org.example.snakegame.GameController;
 import org.example.snakegame.ScoreManager;
 import org.example.snakegame.common.GameEventListener;
 import org.example.snakegame.common.GameResult;
+import org.example.snakegame.common.GameLogger;
 
 /**
  * Jeu Pong - Version corrigée avec synchronisation des boutons
@@ -38,6 +39,7 @@ public class PongGame extends Application {
 
     // Référence au gestionnaire de scores
     private ScoreManager scoreManager;
+    private final GameLogger logger = GameLogger.getLogger(PongGame.class);
 
     @Override
     public void start(Stage primaryStage) {
@@ -112,7 +114,7 @@ public class PongGame extends Application {
         // Afficher
         primaryStage.show();
 
-        System.out.println("Pong Game lancé avec contrôleur !");
+        logger.info("Pong Game lancé avec contrôleur !");
     }
 
     /**
@@ -209,21 +211,21 @@ public class PongGame extends Application {
             case WAITING_RESTART -> {
                 pongController.startGame();
                 startButton.setText("PAUSE");
-                System.out.println("Pong: Jeu démarré via bouton");
+                logger.debug("Pong: Jeu démarré via bouton");
             }
             case PLAYING -> {
                 pongController.togglePause();
                 startButton.setText("RESUME");
-                System.out.println("Pong: Jeu mis en pause via bouton");
+                logger.debug("Pong: Jeu mis en pause via bouton");
             }
             case PAUSED -> {
                 pongController.togglePause();
                 startButton.setText("PAUSE");
-                System.out.println("Pong: Jeu repris via bouton");
+                logger.debug("Pong: Jeu repris via bouton");
             }
             case VICTORY -> {
                 // Ne rien faire, utiliser le bouton RESTART à la place
-                System.out.println("Pong: Utiliser RESTART pour rejouer");
+                logger.debug("Pong: Utiliser RESTART pour rejouer");
             }
         }
         updateScoreDisplay();
@@ -289,10 +291,10 @@ public class PongGame extends Application {
      */
     private void onGameOverEvent(GameResult result) {
         updateScoreDisplay();
-        System.out.println("Victoire ! Score final: " + result.getFinalScore());
-        System.out.println("Score global Pong: " + scoreManager.getPongScore());
+        logger.info("Victoire ! Score final: %d", result.getFinalScore());
+        logger.info("Score global Pong: %s", scoreManager.getPongScore());
         if (result.hasStatistics()) {
-            System.out.println("Statistiques: " + result.getStatistics());
+            logger.info("Statistiques: %s", result.getStatistics());
         }
     }
 
@@ -300,7 +302,7 @@ public class PongGame extends Application {
      * Retourner au menu principal
      */
     private void returnToMenu() {
-        System.out.println("Retour au menu depuis Pong Game");
+        logger.info("Retour au menu depuis Pong Game");
 
         // Arrêter le jeu proprement
         if (pongController != null) {

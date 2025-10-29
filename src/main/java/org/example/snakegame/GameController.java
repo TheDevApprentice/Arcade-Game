@@ -10,6 +10,7 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import org.example.snakegame.snake.SnakeGame;
 import org.example.snakegame.pong.PongGame;
+import org.example.snakegame.common.GameLogger;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -19,6 +20,8 @@ import java.util.ResourceBundle;
  * Gère les interactions utilisateur, barre de titre et affiche les scores globaux
  */
 public class GameController implements Initializable {
+
+    private final GameLogger logger = GameLogger.getLogger(GameController.class);
 
     // Références aux éléments FXML du menu
     @FXML private Button snakeButton;
@@ -57,13 +60,13 @@ public class GameController implements Initializable {
         setupCustomTitleBar();
 
         // Afficher des informations de debug
-        System.out.println("🎮 Menu principal initialisé avec ScoreManager et barre de titre custom");
-        System.out.println("📁 " + getSaveFileInfo());
-        System.out.println("📊 " + getSessionStats());
+        logger.info("🎮 Menu principal initialisé avec ScoreManager et barre de titre custom");
+        logger.info("📁 %s", getSaveFileInfo());
+        logger.info("📊 %s", getSessionStats());
 
         // Afficher le dernier jeu joué si disponible
         if (!scoreManager.getLastPlayedGame().isEmpty()) {
-            System.out.println("🎯 Dernier jeu joué: " + scoreManager.getLastPlayedGame());
+            logger.info("🎯 Dernier jeu joué: %s", scoreManager.getLastPlayedGame());
         }
     }
 
@@ -91,7 +94,7 @@ public class GameController implements Initializable {
             titleBar.setOnMouseEntered(e -> titleBar.setStyle(titleBar.getStyle() + "-fx-cursor: move;"));
             titleBar.setOnMouseExited(e -> titleBar.setStyle(titleBar.getStyle().replace("-fx-cursor: move;", "")));
 
-            System.out.println("✅ Barre de titre draggable configurée");
+            logger.debug("✅ Barre de titre draggable configurée");
         }
     }
 
@@ -103,7 +106,7 @@ public class GameController implements Initializable {
         Stage stage = GameApplication.getPrimaryStage();
         if (stage != null) {
             stage.setIconified(true);
-            System.out.println("📦 Fenêtre minimisée");
+            logger.debug("📦 Fenêtre minimisée");
         }
     }
 
@@ -112,11 +115,11 @@ public class GameController implements Initializable {
      */
     @FXML
     protected void onCloseButtonClick() {
-        System.out.println("❌ Fermeture de l'application via barre de titre...");
+        logger.info("❌ Fermeture de l'application via barre de titre...");
 
         // Afficher un résumé final des scores
-        System.out.println("=== SCORES FINAUX ===");
-        System.out.println(scoreManager.getScoreSummary());
+        logger.info("=== SCORES FINAUX ===");
+        logger.info("%s", scoreManager.getScoreSummary());
 
         // Nettoyer l'audio
         MusicController.getInstance().cleanup();
@@ -134,7 +137,7 @@ public class GameController implements Initializable {
      */
     @FXML
     protected void onSnakeButtonClick() {
-        System.out.println("Lancement de Snake Game...");
+        logger.info("Lancement de Snake Game...");
 
         try {
             // Créer une nouvelle instance du jeu Snake
@@ -147,8 +150,7 @@ public class GameController implements Initializable {
             snakeGame.start(primaryStage);
 
         } catch (Exception e) {
-            System.err.println("Erreur lors du lancement de Snake: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Erreur lors du lancement de Snake: %s", e.getMessage());
         }
     }
 
@@ -157,7 +159,7 @@ public class GameController implements Initializable {
      */
     @FXML
     protected void onPongButtonClick() {
-        System.out.println("Lancement de Pong Game...");
+        logger.info("Lancement de Pong Game...");
 
         try {
             // Créer une nouvelle instance du jeu Pong
@@ -170,8 +172,7 @@ public class GameController implements Initializable {
             pongGame.start(primaryStage);
 
         } catch (Exception e) {
-            System.err.println("Erreur lors du lancement de Pong: " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Erreur lors du lancement de Pong: %s", e.getMessage());
         }
     }
 
@@ -180,11 +181,11 @@ public class GameController implements Initializable {
      */
     @FXML
     protected void onQuitButtonClick() {
-        System.out.println("Fermeture de l'application...");
+        logger.info("Fermeture de l'application...");
 
         // Afficher un résumé final des scores
-        System.out.println("=== SCORES FINAUX ===");
-        System.out.println(scoreManager.getScoreSummary());
+        logger.info("=== SCORES FINAUX ===");
+        logger.info("%s", scoreManager.getScoreSummary());
 
         // Fermer l'application proprement
         Platform.exit();
@@ -203,7 +204,7 @@ public class GameController implements Initializable {
         updateSnakeScoreDisplay(snakeHigh);
         updatePongScoreDisplay(pongHigh);
 
-        System.out.println("Scores chargés - Snake: " + snakeHigh + ", Pong: " + pongHigh);
+        logger.debug("Scores chargés - Snake: %d, Pong: %s", snakeHigh, pongHigh);
     }
 
     /**
@@ -243,8 +244,8 @@ public class GameController implements Initializable {
      */
     public void refreshScores() {
         loadHighScores();
-        System.out.println("Scores rafraîchis dans le menu principal");
-        System.out.println(scoreManager.getScoreSummary());
+        logger.debug("Scores rafraîchis dans le menu principal");
+        logger.debug("%s", scoreManager.getScoreSummary());
     }
 
     /**
@@ -275,7 +276,8 @@ public class GameController implements Initializable {
      * Sera appelée par les jeux individuels
      */
     public static void returnToMenu() {
-        System.out.println("🔙 Retour au menu principal...");
+        GameLogger logger = GameLogger.getLogger(GameController.class);
+        logger.info("🔙 Retour au menu principal...");
 
         // Utiliser la méthode qui ne relance pas le splash screen
         Platform.runLater(() -> {
@@ -298,7 +300,7 @@ public class GameController implements Initializable {
     public void resetAllScores() {
         scoreManager.resetAllScores();
         refreshScores();
-        System.out.println("Tous les scores ont été réinitialisés depuis le menu !");
+        logger.info("Tous les scores ont été réinitialisés depuis le menu !");
     }
 
     /**
@@ -306,7 +308,7 @@ public class GameController implements Initializable {
      */
     public void exportScores() {
         scoreManager.exportScores();
-        System.out.println("Scores exportés depuis le menu !");
+        logger.info("Scores exportés depuis le menu !");
     }
 
     /**
