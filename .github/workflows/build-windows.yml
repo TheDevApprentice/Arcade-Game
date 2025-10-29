@@ -113,8 +113,6 @@ jobs:
         name: RetroArcade-Windows-Package
         path: target/RetroArcade-Windows.zip
         
-<<<<<<< Updated upstream
-=======
     - name: Publish Package to GitHub Packages
       if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       run: |
@@ -162,7 +160,6 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
->>>>>>> Stashed changes
     - name: Generate release tag
       id: tag
       run: |
@@ -191,8 +188,6 @@ jobs:
           - Automatic score saving
           - Retro music and sound effects
           
-<<<<<<< Updated upstream
-=======
           ### 📦 Maven Package
           Also available as Maven dependency:
           ```xml
@@ -203,7 +198,6 @@ jobs:
           </dependency>
           ```
           
->>>>>>> Stashed changes
           Built with ❤️ by GitHub Actions
         files: |
           target/dist/*.exe
@@ -211,31 +205,5 @@ jobs:
         draft: false
         prerelease: false
         make_latest: true
-<<<<<<< Updated upstream
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
-    - name: Publish Package to GitHub Packages
-      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-      run: |
-        # Configuration Maven pour GitHub Packages
-        mkdir -p ~/.m2
-        cat > ~/.m2/settings.xml << 'EOF'
-        <settings>
-          <servers>
-            <server>
-              <id>github</id>
-              <username>${{ github.actor }}</username>
-              <password>${{ secrets.GITHUB_TOKEN }}</password>
-            </server>
-          </servers>
-        </settings>
-        EOF
-        
-        # Deploy vers GitHub Packages
-        mvn deploy -DskipTests
-      shell: bash
-=======
->>>>>>> Stashed changes
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
