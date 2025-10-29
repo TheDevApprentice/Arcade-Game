@@ -12,12 +12,18 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.example.snakegame.GameController;
 import org.example.snakegame.ScoreManager;
+import org.example.snakegame.common.Game;
+import org.example.snakegame.common.GameEventListener;
+import org.example.snakegame.common.GameResult;
+import org.example.snakegame.common.GameLogger;
+import org.example.snakegame.common.GameState;
 
 /**
  * Jeu Snake - Version corrigée avec synchronisation des boutons
  * Application JavaFX complète pour le jeu du serpent
+ * Implémente l'interface Game pour respecter l'OCP
  */
-public class SnakeGame extends Application {
+public class SnakeGame extends Application implements Game {
 
     // Constantes du jeu
     private static final int CANVAS_WIDTH = 800;
@@ -38,6 +44,7 @@ public class SnakeGame extends Application {
 
     // Référence au gestionnaire de scores
     private ScoreManager scoreManager;
+    private final GameLogger logger = GameLogger.getLogger(SnakeGame.class);
 
     @Override
     public void start(Stage primaryStage) {
@@ -57,8 +64,7 @@ public class SnakeGame extends Application {
         scene.getStylesheets().addAll(
                 getClass().getResource("/org/example/snakegame/styles/styles.css").toExternalForm(),
                 getClass().getResource("/org/example/snakegame/styles/snake-styles.css").toExternalForm(),
-                getClass().getResource("/org/example/snakegame/styles/menu-styles.css").toExternalForm()
-        );
+                getClass().getResource("/org/example/snakegame/styles/menu-styles.css").toExternalForm());
 
         // Appliquer les styles
         root.getStyleClass().add("snake-game-container");
@@ -68,9 +74,19 @@ public class SnakeGame extends Application {
         GraphicsContext gc = gameCanvas.getGraphicsContext2D();
         snakeController = new SnakeController(gc);
 
-        // Configurer les callbacks
-        snakeController.setScoreUpdateCallback(this::updateScoreDisplay);
-        snakeController.setGameOverCallback(this::onGameOver);
+        // Configurer les callbacks avec les nouvelles interfaces
+        snakeController.setScoreUpdateListener((newScore, delta) -> updateScoreDisplay());
+        snakeController.setGameEventListener(new GameEventListener() {
+            @Override
+            public void onScoreUpdate(int newScore) {
+                updateScoreDisplay();
+            }
+
+            @Override
+            public void onGameOver(GameResult result) {
+                onGameOverEvent(result);
+            }
+        });
 
         // Gestion des touches - CORRIGÉ
         scene.setOnKeyPressed(event -> {
@@ -100,7 +116,7 @@ public class SnakeGame extends Application {
         // Afficher
         primaryStage.show();
 
-        System.out.println("Snake Game lancé avec contrôleur !");
+        logger.info("Snake Game lancé avec contrôleur !");
     }
 
     /**
@@ -205,21 +221,21 @@ public class SnakeGame extends Application {
             case WAITING_RESTART -> {
                 snakeController.startGame();
                 startButton.setText("PAUSE");
-                System.out.println("Snake: Jeu démarré via bouton");
+                logger.debug("Snake: Jeu démarré via bouton");
             }
             case PLAYING -> {
                 snakeController.togglePause();
                 startButton.setText("RESUME");
-                System.out.println("Snake: Jeu mis en pause via bouton");
+                logger.debug("Snake: Jeu mis en pause via bouton");
             }
             case PAUSED -> {
                 snakeController.togglePause();
                 startButton.setText("PAUSE");
-                System.out.println("Snake: Jeu repris via bouton");
+                logger.debug("Snake: Jeu repris via bouton");
             }
             case GAME_OVER -> {
                 // Ne rien faire, utiliser le bouton RESTART à la place
-                System.out.println("Snake: Utiliser RESTART pour rejouer");
+                logger.debug("Snake: Utiliser RESTART pour rejouer");
             }
         }
         updateScoreDisplay();
@@ -229,7 +245,8 @@ public class SnakeGame extends Application {
      * NOUVEAU: Synchroniser le texte du bouton avec l'état du jeu
      */
     private void synchronizeStartButton() {
-        if (startButton == null) return;
+        if (startButton == null)
+            return;
 
         switch (snakeController.getGameState()) {
             case WAITING_RESTART -> startButton.setText("START");
@@ -278,21 +295,22 @@ public class SnakeGame extends Application {
     }
 
     /**
-     * Callback appelé lors du game over
+     * Callback appelé lors du game over avec GameResult
      */
-    private void onGameOver() {
+    private void onGameOverEvent(GameResult result) {
         updateScoreDisplay();
-        System.out.println("Game Over ! Score final: " + snakeController.getScore());
-        System.out.println("Score enregistré dans ScoreManager: " + scoreManager.getSnakeTotalScore());
-
-        // Optionnel: effet sonore, animation, etc.
+        logger.info("Game Over ! Score final: %d", result.getFinalScore());
+        logger.info("Score enregistré dans ScoreManager: %d", scoreManager.getSnakeTotalScore());
+        if (result.hasStatistics()) {
+            logger.info("Statistiques: %s", result.getStatistics());
+        }
     }
 
     /**
      * Retourner au menu principal
      */
     private void returnToMenu() {
-        System.out.println("Retour au menu depuis Snake Game");
+        logger.info("Retour au menu depuis Snake Game");
 
         // Arrêter le jeu proprement
         if (snakeController != null) {
@@ -303,6 +321,14 @@ public class SnakeGame extends Application {
         GameController.returnToMenu();
     }
 
+    /**
+     * Implémentation de l'interface Game
+     */
+    @Override
+    public String getName() {
+        return "Snake";
+    }
+    
     /**
      * Méthode main pour tests indépendants
      */

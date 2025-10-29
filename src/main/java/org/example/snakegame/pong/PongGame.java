@@ -12,12 +12,18 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.example.snakegame.GameController;
 import org.example.snakegame.ScoreManager;
+import org.example.snakegame.common.Game;
+import org.example.snakegame.common.GameEventListener;
+import org.example.snakegame.common.GameResult;
+import org.example.snakegame.common.GameLogger;
+import org.example.snakegame.common.GameState;
 
 /**
  * Jeu Pong - Version corrigée avec synchronisation des boutons
- * Application JavaFX complète pour le jeu de Pong
+ * Application JavaFX complète pour le jeu Pong
+ * Implémente l'interface Game pour respecter l'OCP
  */
-public class PongGame extends Application {
+public class PongGame extends Application implements Game {
 
     // Constantes du jeu
     private static final int CANVAS_WIDTH = 800;
@@ -36,6 +42,7 @@ public class PongGame extends Application {
 
     // Référence au gestionnaire de scores
     private ScoreManager scoreManager;
+    private final GameLogger logger = GameLogger.getLogger(PongGame.class);
 
     @Override
     public void start(Stage primaryStage) {
@@ -43,7 +50,7 @@ public class PongGame extends Application {
         scoreManager = ScoreManager.getInstance();
 
         // Configuration de la fenêtre
-        primaryStage.setTitle("🏓 PONG GAME - Retro Arcade");
+        primaryStage.setTitle(" PONG GAME - Retro Arcade");
 
         // Créer l'interface
         VBox root = createGameInterface();
@@ -66,9 +73,19 @@ public class PongGame extends Application {
         GraphicsContext gc = gameCanvas.getGraphicsContext2D();
         pongController = new PongController(gc);
 
-        // Configurer les callbacks
-        pongController.setScoreUpdateCallback(this::updateScoreDisplay);
-        pongController.setGameOverCallback(this::onGameOver);
+        // Configurer les callbacks avec les nouvelles interfaces
+        pongController.setScoreUpdateListener((newScore, delta) -> updateScoreDisplay());
+        pongController.setGameEventListener(new GameEventListener() {
+            @Override
+            public void onScoreUpdate(int newScore) {
+                updateScoreDisplay();
+            }
+
+            @Override
+            public void onGameOver(GameResult result) {
+                onGameOverEvent(result);
+            }
+        });
 
         // Gestion des touches - CORRIGÉ
         scene.setOnKeyPressed(event -> {
@@ -100,7 +117,7 @@ public class PongGame extends Application {
         // Afficher
         primaryStage.show();
 
-        System.out.println("Pong Game lancé avec contrôleur !");
+        logger.info("Pong Game lancé avec contrôleur !");
     }
 
     /**
@@ -197,21 +214,21 @@ public class PongGame extends Application {
             case WAITING_RESTART -> {
                 pongController.startGame();
                 startButton.setText("PAUSE");
-                System.out.println("Pong: Jeu démarré via bouton");
+                logger.debug("Pong: Jeu démarré via bouton");
             }
             case PLAYING -> {
                 pongController.togglePause();
                 startButton.setText("RESUME");
-                System.out.println("Pong: Jeu mis en pause via bouton");
+                logger.debug("Pong: Jeu mis en pause via bouton");
             }
             case PAUSED -> {
                 pongController.togglePause();
                 startButton.setText("PAUSE");
-                System.out.println("Pong: Jeu repris via bouton");
+                logger.debug("Pong: Jeu repris via bouton");
             }
             case VICTORY -> {
                 // Ne rien faire, utiliser le bouton RESTART à la place
-                System.out.println("Pong: Utiliser RESTART pour rejouer");
+                logger.debug("Pong: Utiliser RESTART pour rejouer");
             }
         }
         updateScoreDisplay();
@@ -273,23 +290,22 @@ public class PongGame extends Application {
     }
 
     /**
-     * Callback appelé lors de la fin de partie
+     * Callback appelé lors de la fin de partie avec GameResult
      */
-    private void onGameOver() {
+    private void onGameOverEvent(GameResult result) {
         updateScoreDisplay();
-        String winner = pongController.getPlayer1Score() >= 5 ? "Joueur 1" : "IA";
-        System.out.println("Victoire de " + winner + " ! Score: " +
-                pongController.getPlayer1Score() + "-" + pongController.getPlayer2Score());
-        System.out.println("Score global Pong: " + scoreManager.getPongScore());
-
-        // Optionnel: effet sonore, animation, etc.
+        logger.info("Victoire ! Score final: %d", result.getFinalScore());
+        logger.info("Score global Pong: %s", scoreManager.getPongScore());
+        if (result.hasStatistics()) {
+            logger.info("Statistiques: %s", result.getStatistics());
+        }
     }
 
     /**
      * Retourner au menu principal
      */
     private void returnToMenu() {
-        System.out.println("Retour au menu depuis Pong Game");
+        logger.info("Retour au menu depuis Pong Game");
 
         // Arrêter le jeu proprement
         if (pongController != null) {
@@ -300,6 +316,14 @@ public class PongGame extends Application {
         GameController.returnToMenu();
     }
 
+    /**
+     * Implémentation de l'interface Game
+     */
+    @Override
+    public String getName() {
+        return "Pong";
+    }
+    
     /**
      * Méthode main pour tests indépendants
      */

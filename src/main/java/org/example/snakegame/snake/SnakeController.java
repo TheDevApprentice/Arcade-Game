@@ -7,28 +7,38 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
 import org.example.snakegame.MusicController;
+import org.example.snakegame.ScoreManager;
+import org.example.snakegame.common.AbstractGameController;
 import org.example.snakegame.common.Direction;
+import org.example.snakegame.common.GameResult;
 import org.example.snakegame.common.GameState;
 import org.example.snakegame.common.Point;
-import org.example.snakegame.ScoreManager;
+import org.example.snakegame.common.ValidationUtils;
 
 /**
- * Contrôleur du jeu Snake utilisant les objets Snake et Food
- * Version corrigée avec système de scores global et performance améliorée
+ * Contrôleur du jeu Snake
+ * Version refactorisée avec logging structuré, validation et SRP
+ * Le rendu est délégué à SnakeRenderer (SRP)
  */
-public class SnakeController {
+public class SnakeController extends AbstractGameController {
 
-    private MusicController musicController;
+    private final MusicController musicController;
     // Constantes du jeu
     private static final int CELL_SIZE = 20;
     private static final int BOARD_WIDTH = 40;  // 800px / 20px
     private static final int BOARD_HEIGHT = 30; // 600px / 20px
     private static final int INITIAL_GAME_SPEED = 120; // Réduit pour plus de fluidité
+    
+    // Constantes pour l'accélération du jeu
+    private static final int SPEED_INCREASE_THRESHOLD = 5; // Tous les 5 aliments
+    private static final int SPEED_DECREASE_AMOUNT = 8; // Réduction de vitesse en ms
+    private static final int MIN_GAME_SPEED = 60; // Vitesse minimale (= vitesse max)
 
-    // État du jeu
-    private GameState gameState;
-    private Timeline gameLoop;
-    private GraphicsContext gc;
+    // État du jeu (gameState et gameLoop sont dans AbstractGameController)
+    private final GraphicsContext gc;
+    
+    // Renderer dédié (SRP)
+    private final SnakeRenderer renderer;
 
     // Objets du jeu
     private Snake snake;
@@ -36,24 +46,23 @@ public class SnakeController {
 
     // Statistiques locales (pour la partie en cours)
     private int currentScore;
+    private int previousScore;
     private int gameSpeed;
     private int foodEaten;
 
     // Référence au gestionnaire de scores global
-    private ScoreManager scoreManager;
-
-    // Callbacks pour l'interface
-    private Runnable scoreUpdateCallback;
-    private Runnable gameOverCallback;
+    private final ScoreManager scoreManager;
 
     /**
      * Constructeur du contrôleur Snake
      */
     public SnakeController(GraphicsContext gc) {
-        this.gc = gc;
+        super(SnakeController.class);
+        this.gc = ValidationUtils.requireNonNull(gc, "graphicsContext");
+        this.renderer = new SnakeRenderer(gc, CELL_SIZE, BOARD_WIDTH, BOARD_HEIGHT);
         this.scoreManager = ScoreManager.getInstance();
-        this.gameState = GameState.STARTING;
         this.musicController = MusicController.getInstance();
+        this.previousScore = 0;
 
         // Initialiser le jeu
         initializeGame();
@@ -78,7 +87,7 @@ public class SnakeController {
         foodEaten = 0;
 
         // État initial
-        gameState = GameState.WAITING_RESTART;
+        updateGameState(GameState.WAITING_RESTART);
 
         // Dessiner l'état initial
         render();
@@ -124,7 +133,7 @@ public class SnakeController {
 
         // Vérifier expiration de la nourriture spéciale
         if (food.hasExpired()) {
-            System.out.println("Nourriture expirée ! Nouvelle nourriture générée.");
+            logger.warn("Nourriture expirée, génération d'une nouvelle position");
             food.generateNewPosition(BOARD_WIDTH, BOARD_HEIGHT, snake.getBody());
         }
 
@@ -174,16 +183,19 @@ public class SnakeController {
 
         // Afficher l'effet
         if (!effect.isEmpty()) {
-            System.out.println("Effet spécial: " + effect);
+            logger.info("Effet spécial activé: %s", effect);
         }
         if (food.getType() == Food.FoodType.NORMAL) {
             musicController.playSnakeEat();
         } else {
             musicController.playSnakeSpecialFood();
         }
-        // Augmenter la vitesse tous les 5 aliments normaux (plus progressif)
-        if (food.getType() == Food.FoodType.NORMAL && foodEaten % 5 == 0 && gameSpeed > 60) {
-            gameSpeed -= 8; // Réduction plus douce
+        // Augmenter la vitesse tous les SPEED_INCREASE_THRESHOLD aliments normaux
+        if (food.getType() == Food.FoodType.NORMAL && 
+            foodEaten % SPEED_INCREASE_THRESHOLD == 0 && 
+            gameSpeed > MIN_GAME_SPEED) {
+            gameSpeed -= SPEED_DECREASE_AMOUNT;
+            logger.debug("Accélération: nouvelle vitesse %dms", gameSpeed);
             updateGameSpeed();
         }
 
@@ -191,12 +203,11 @@ public class SnakeController {
         food.generateNewPosition(BOARD_WIDTH, BOARD_HEIGHT, snake.getBody());
 
         // Notifier l'interface du changement de score
-        if (scoreUpdateCallback != null) {
-            scoreUpdateCallback.run();
-        }
+        int delta = currentScore - previousScore;
+        notifyScoreUpdate(currentScore, delta);
+        previousScore = currentScore;
 
-        System.out.println("Score: " + currentScore + " | Longueur: " + snake.getLength() +
-                " | Type: " + food.getType());
+        logger.info("Score: %d | Longueur: %d | Type: %s", currentScore, snake.getLength(), food.getType());
     }
 
     /**
@@ -208,21 +219,21 @@ public class SnakeController {
                 if (gameSpeed > 40) {
                     gameSpeed -= 15;
                     updateGameSpeed();
-                    System.out.println("Vitesse augmentée ! Nouveau délai: " + gameSpeed + "ms");
+                    logger.game("⚡", "Vitesse augmentée, délai=%dms", gameSpeed);
                 }
             }
             case SLOW_DOWN -> {
                 if (gameSpeed < 180) {
                     gameSpeed += 25;
                     updateGameSpeed();
-                    System.out.println("Vitesse réduite ! Nouveau délai: " + gameSpeed + "ms");
+                    logger.game("🐢", "Vitesse réduite, délai=%dms", gameSpeed);
                 }
             }
             case MULTI_GROW -> {
-                System.out.println("Le serpent grandit de " + food.getGrowthAmount() + " segments !");
+                logger.game("➕", "Le serpent grandit de %d segments", food.getGrowthAmount());
             }
             case SUPER_BONUS -> {
-                System.out.println("SUPER BONUS ! +" + food.getValue() + " points et croissance bonus !");
+                logger.game("🌟", "Super bonus: +%d points", food.getValue());
             }
         }
     }
@@ -232,26 +243,29 @@ public class SnakeController {
      */
     private void gameOver() {
         musicController.playSnakeGameOver();
-        gameState = GameState.GAME_OVER;
+        updateGameState(GameState.GAME_OVER);
         gameLoop.stop();
 
         // IMPORTANT: Enregistrer le score dans le gestionnaire global
         scoreManager.recordSnakeScore(currentScore);
 
         // Afficher les statistiques finales
-        System.out.println("=== GAME OVER ===");
-        System.out.println("Score cette partie: " + currentScore);
-        System.out.println("Longueur finale: " + snake.getLength());
-        System.out.println("High Score global: " + scoreManager.getSnakeHighScore());
-        System.out.println("Score total: " + scoreManager.getSnakeTotalScore());
-        System.out.println("Parties jouées: " + scoreManager.getSnakeGamesPlayed());
+        logger.info("=== GAME OVER ===");
+        logger.info("Score partie: %d", currentScore);
+        logger.info("Longueur finale: %d", snake.getLength());
+        logger.info("High Score global: %d", scoreManager.getSnakeHighScore());
+        logger.info("Score total: %d", scoreManager.getSnakeTotalScore());
+        logger.info("Parties jouées: %d", scoreManager.getSnakeGamesPlayed());
 
-        // Notifier l'interface
-        if (gameOverCallback != null) {
-            gameOverCallback.run();
-        }
+        // Notifier l'interface avec GameResult
+        GameResult.GameStatistics statistics = new GameResult.GameStatistics(
+                snake.getLength(),
+                foodEaten,
+                String.format("Vitesse finale: %d", gameSpeed)
+        );
+        notifyGameOver(new GameResult("Snake", currentScore, false, statistics));
 
-        render(); // Redessiner avec l'état de game over
+        render();
     }
 
     /**
@@ -275,288 +289,79 @@ public class SnakeController {
      * Gestion des touches du clavier
      */
     public void handleKeyPress(KeyCode keyCode) {
-        System.out.println("Touche pressée: " + keyCode); // Debug
+        logger.debug("Touche pressée: %s", keyCode);
 
         switch (keyCode) {
             case UP -> {
                 boolean changed = snake.setDirection(Direction.UP);
-                if (changed) System.out.println("Direction changée vers: UP");
+                if (changed) logger.debug("Direction changée vers: UP");
             }
             case DOWN -> {
                 boolean changed = snake.setDirection(Direction.DOWN);
-                if (changed) System.out.println("Direction changée vers: DOWN");
+                if (changed) logger.debug("Direction changée vers: DOWN");
             }
             case LEFT -> {
                 boolean changed = snake.setDirection(Direction.LEFT);
-                if (changed) System.out.println("Direction changée vers: LEFT");
+                if (changed) logger.debug("Direction changée vers: LEFT");
             }
             case RIGHT -> {
                 boolean changed = snake.setDirection(Direction.RIGHT);
-                if (changed) System.out.println("Direction changée vers: RIGHT");
+                if (changed) logger.debug("Direction changée vers: RIGHT");
             }
             case SPACE -> {
                 togglePause();
-                System.out.println("Pause toggled - État: " + gameState);
+                logger.debug("Pause toggled - État: %s", gameState);
             }
             case R -> {
                 if (gameState.canBeRestarted()) {
                     restartGame();
-                    System.out.println("Jeu redémarré");
+                    logger.info("Jeu redémarré via clavier");
                 }
             }
             case ENTER -> {
                 if (gameState == GameState.WAITING_RESTART) {
                     startGame();
-                    System.out.println("Jeu démarré avec ENTRÉE");
+                    logger.info("Jeu démarré avec ENTRÉE");
                 }
             }
             default -> {
-                System.out.println("Touche ignorée: " + keyCode);
+                logger.debug("Touche ignorée: %s", keyCode);
             }
         }
     }
 
-    /**
-     * Démarrer le jeu - CORRIGÉ
-     */
-    public void startGame() {
-        if (gameState == GameState.WAITING_RESTART) {
-            gameState = GameState.PLAYING;
-            gameLoop.play();
-            System.out.println("Snake: Jeu démarré !");
-
-            // Notifier l'interface pour mettre à jour le bouton
-            if (scoreUpdateCallback != null) {
-                scoreUpdateCallback.run();
-            }
-        }
+    @Override
+    protected String getGameName() {
+        return "Snake";
     }
 
-    /**
-     * Basculer pause/play
-     */
-    public void togglePause() {
-        if (gameState == GameState.PLAYING) {
-            gameState = GameState.PAUSED;
-            if (gameLoop != null) {
-                gameLoop.pause();
-            }
-            System.out.println("Jeu mis en pause");
-        } else if (gameState == GameState.PAUSED) {
-            gameState = GameState.PLAYING;
-            if (gameLoop != null) {
-                gameLoop.play();
-            }
-            System.out.println("Jeu repris");
-        }
-        render(); // Important: redessiner immédiatement pour montrer l'état
-    }
-
-    /**
-     * Redémarrer le jeu
-     */
-    public void restartGame() {
-        if (gameLoop != null) {
-            gameLoop.stop();
-        }
+    @Override
+    protected void onRestart() {
         initializeGame();
-        System.out.println("Snake: Jeu redémarré !");
+    }
+
+    @Override
+    protected void onPauseToggled() {
+        render(); // Rafraîchir l'affichage lors de la pause
     }
 
     /**
-     * Arrêter le jeu
-     */
-    public void stopGame() {
-        if (gameLoop != null) {
-            gameLoop.stop();
-        }
-        gameState = GameState.WAITING_RESTART;
-    }
-
-    /**
-     * Rendu graphique principal (inchangé mais optimisé)
+     * Rendu graphique principal - Délégation au renderer (SRP)
      */
     public void render() {
-        // Effacer le canvas
-        gc.setFill(Color.BLACK);
-        gc.fillRect(0, 0, BOARD_WIDTH * CELL_SIZE, BOARD_HEIGHT * CELL_SIZE);
-
-        // Dessiner la grille (optionnel, effet rétro)
-        drawGrid();
-
-        // Dessiner la nourriture
-        drawFood();
-
-        // Dessiner le serpent
-        drawSnake();
-
-        // Dessiner les messages d'état
-        drawStatusMessages();
-
-        // Bordure du jeu
-        drawBorder();
+        renderer.render(
+            snake, 
+            food, 
+            currentScore, 
+            scoreManager.getSnakeHighScore(), 
+            foodEaten, 
+            gameState
+        );
     }
 
-    /**
-     * Dessiner la grille de fond
-     */
-    private void drawGrid() {
-        gc.setStroke(Color.rgb(0, 50, 0));
-        gc.setLineWidth(0.5);
-
-        // Lignes verticales
-        for (int x = 0; x <= BOARD_WIDTH; x++) {
-            gc.strokeLine(x * CELL_SIZE, 0, x * CELL_SIZE, BOARD_HEIGHT * CELL_SIZE);
-        }
-
-        // Lignes horizontales
-        for (int y = 0; y <= BOARD_HEIGHT; y++) {
-            gc.strokeLine(0, y * CELL_SIZE, BOARD_WIDTH * CELL_SIZE, y * CELL_SIZE);
-        }
-    }
-
-    /**
-     * Dessiner le serpent
-     */
-    private void drawSnake() {
-        var body = snake.getBody();
-        for (int i = 0; i < body.size(); i++) {
-            Point segment = body.get(i);
-
-            if (i == 0) {
-                // Tête du serpent (plus brillante)
-                gc.setFill(Color.LIME);
-            } else {
-                // Corps du serpent (dégradé)
-                double alpha = 1.0 - (i * 0.1);
-                alpha = Math.max(alpha, 0.3);
-                gc.setFill(Color.rgb(0, (int)(255 * alpha), 0));
-            }
-
-            gc.fillRect(
-                    segment.x * CELL_SIZE,
-                    segment.y * CELL_SIZE,
-                    CELL_SIZE - 1,
-                    CELL_SIZE - 1
-            );
-        }
-    }
-
-    /**
-     * Dessiner la nourriture avec couleur selon le type
-     */
-    private void drawFood() {
-        Point pos = food.getPosition();
-
-        // Couleur selon le type
-        String colorStr = food.getColor();
-        Color color = Color.web(colorStr);
-
-        // Effet de clignotement si proche de l'expiration
-        if (food.shouldBlink()) {
-            long time = System.currentTimeMillis();
-            if ((time / 200) % 2 == 0) { // Clignote toutes les 200ms
-                color = Color.WHITE;
-            }
-        }
-
-        gc.setFill(color);
-
-        if (food.isSpecial()) {
-            // Nourriture spéciale = forme différente + effet
-            gc.fillOval(
-                    pos.x * CELL_SIZE + 1,
-                    pos.y * CELL_SIZE + 1,
-                    CELL_SIZE - 2,
-                    CELL_SIZE - 2
-            );
-
-            // Effet de brillance pour nourriture spéciale
-            gc.setFill(Color.WHITE);
-            gc.fillOval(
-                    pos.x * CELL_SIZE + 4,
-                    pos.y * CELL_SIZE + 4,
-                    CELL_SIZE - 8,
-                    CELL_SIZE - 8
-            );
-        } else {
-            // Nourriture normale = carré simple
-            gc.fillRect(
-                    pos.x * CELL_SIZE + 2,
-                    pos.y * CELL_SIZE + 2,
-                    CELL_SIZE - 4,
-                    CELL_SIZE - 4
-            );
-        }
-    }
-
-    /**
-     * Dessiner les messages d'état
-     */
-    private void drawStatusMessages() {
-        gc.setFill(Color.WHITE);
-        gc.setFont(javafx.scene.text.Font.font("Courier New", 16));
-
-        String message = switch (gameState) {
-            case WAITING_RESTART -> "Appuyez sur ENTRÉE pour commencer !";
-            case PAUSED -> "JEU EN PAUSE - Appuyez sur ESPACE pour reprendre";
-            case GAME_OVER -> "GAME OVER - Appuyez sur R pour rejouer";
-            default -> "";
-        };
-
-        if (!message.isEmpty()) {
-            gc.fillText(message, 50, BOARD_HEIGHT * CELL_SIZE / 2);
-        }
-
-        // Afficher les statistiques globales en game over
-        if (gameState == GameState.GAME_OVER) {
-            gc.setFont(javafx.scene.text.Font.font("Courier New", 12));
-            gc.setFill(Color.YELLOW);
-
-            int baseY = BOARD_HEIGHT * CELL_SIZE / 2 + 40;
-            gc.fillText("High Score: " + scoreManager.getSnakeHighScore(), 50, baseY);
-            gc.fillText("Parties jouées: " + scoreManager.getSnakeGamesPlayed(), 50, baseY + 20);
-            gc.fillText("Score total: " + scoreManager.getSnakeTotalScore(), 50, baseY + 40);
-            gc.fillText("Moyenne: " + scoreManager.getSnakeAverageScore(), 50, baseY + 60);
-        }
-
-        // Afficher le type de nourriture actuelle
-        if (food.isSpecial() && gameState == GameState.PLAYING) {
-            String foodInfo = food.getType().name();
-            if (food.getTimeToExpiration() < Long.MAX_VALUE) {
-                foodInfo += " (" + food.getTimeToExpiration() + "s)";
-            }
-            gc.setFill(Color.YELLOW);
-            gc.setFont(javafx.scene.text.Font.font("Courier New", 12));
-            gc.fillText(foodInfo, 10, 20);
-        }
-    }
-
-    /**
-     * Dessiner la bordure
-     */
-    private void drawBorder() {
-        gc.setStroke(Color.CYAN);
-        gc.setLineWidth(2);
-        gc.strokeRect(0, 0, BOARD_WIDTH * CELL_SIZE, BOARD_HEIGHT * CELL_SIZE);
-    }
-
-    // Getters pour l'interface (corrigés pour utiliser le ScoreManager)
+    // Getters pour l'interface (utilisés par SnakeGame)
     public int getScore() { return currentScore; }
     public int getHighScore() { return scoreManager.getSnakeHighScore(); }
     public int getSnakeLength() { return snake.getLength(); }
-    public GameState getGameState() { return gameState; }
     public int getGameSpeed() { return INITIAL_GAME_SPEED - gameSpeed + 50; }
-    public int getTotalScore() { return scoreManager.getSnakeTotalScore(); }
-    public int getGamesPlayed() { return scoreManager.getSnakeGamesPlayed(); }
-    public int getAverageScore() { return scoreManager.getSnakeAverageScore(); }
-
-    // Setters pour les callbacks
-    public void setScoreUpdateCallback(Runnable callback) {
-        this.scoreUpdateCallback = callback;
-    }
-
-    public void setGameOverCallback(Runnable callback) {
-        this.gameOverCallback = callback;
-    }
 }

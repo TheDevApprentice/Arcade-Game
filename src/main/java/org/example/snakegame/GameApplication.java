@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.example.snakegame.common.GameLogger;
 
 import java.io.IOException;
 
@@ -24,6 +25,7 @@ public class GameApplication extends Application {
 
     // Flag pour savoir si c'est le premier démarrage
     private static boolean isFirstLaunch = true;
+    private final GameLogger logger = GameLogger.getLogger(GameApplication.class);
 
     @Override
     public void start(Stage stage) throws IOException {
@@ -33,7 +35,7 @@ public class GameApplication extends Application {
         scoreManager = ScoreManager.getInstance();
         musicController = MusicController.getInstance();
 
-        System.out.println("🎮 Retro Arcade - Démarrage...");
+        logger.info("🎮 Retro Arcade - Démarrage...");
 
         if (isFirstLaunch) {
             // Premier démarrage : afficher le splash screen
@@ -50,8 +52,7 @@ public class GameApplication extends Application {
                 try {
                     initializeMainApplication(stage);
                 } catch (IOException e) {
-                    System.err.println("❌ Erreur lors du chargement du menu principal: " + e.getMessage());
-                    e.printStackTrace();
+                    logger.error("❌ Erreur lors du chargement du menu principal: %s", e.getMessage());
                 }
             });
         } else {
@@ -64,13 +65,12 @@ public class GameApplication extends Application {
      * Initialiser l'application principale après le splash screen
      */
     private void initializeMainApplication(Stage stage) throws IOException {
-        System.out.println("🎮 Retro Arcade démarré !");
-        System.out.println("📁 Fichier de scores: " + scoreManager.getSaveFilePath().toAbsolutePath());
+        logger.info("🎮 Retro Arcade démarré !");
+        logger.info("📁 Fichier de scores: %s", scoreManager.getSaveFilePath().toAbsolutePath());
 
         // Charger l'interface FXML du menu
         FXMLLoader fxmlLoader = new FXMLLoader(
-                GameApplication.class.getResource("/org/example/snakegame/views/game-view-custom-titlebar.fxml")
-        );
+                GameApplication.class.getResource("/org/example/snakegame/views/game-view-custom-titlebar.fxml"));
 
         // Créer la scène (800x600 pour un menu confortable)
         Scene menuScene = new Scene(fxmlLoader.load(), CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -78,8 +78,7 @@ public class GameApplication extends Application {
         // Charger tous les styles CSS rétro
         menuScene.getStylesheets().addAll(
                 getClass().getResource("/org/example/snakegame/styles/styles.css").toExternalForm(),
-                getClass().getResource("/org/example/snakegame/styles/menu-styles.css").toExternalForm()
-        );
+                getClass().getResource("/org/example/snakegame/styles/menu-styles.css").toExternalForm());
 
         // Configuration de la fenêtre
         stage.initStyle(StageStyle.UNDECORATED);
@@ -90,7 +89,7 @@ public class GameApplication extends Application {
 
         // Gestionnaire de fermeture pour sauvegarder les scores
         stage.setOnCloseRequest(event -> {
-            System.out.println("🔄 Fermeture de l'application...");
+            logger.info("🔄 Fermeture de l'application...");
 
             // Nettoyer l'audio
             musicController.cleanup();
@@ -99,17 +98,17 @@ public class GameApplication extends Application {
             scoreManager.forceSave();
 
             // Afficher un résumé final
-            System.out.println(scoreManager.getScoreSummary());
-            System.out.println("👋 À bientôt dans Retro Arcade !");
+            logger.info("%s", scoreManager.getScoreSummary());
+            logger.info("👋 À bientôt dans Retro Arcade !");
         });
 
         // Afficher la fenêtre principale
         stage.show();
 
         // Afficher les scores actuels au démarrage
-        System.out.println("📊 Scores chargés:");
-        System.out.println(scoreManager.getScoreSummary());
-        System.out.println(musicController.getAudioStatus());
+        logger.info("📊 Scores chargés:");
+        logger.info("%s", scoreManager.getScoreSummary());
+        logger.info("%s", musicController.getAudioStatus());
     }
 
     /**
@@ -119,8 +118,7 @@ public class GameApplication extends Application {
         try {
             // Charger directement le menu principal sans splash
             FXMLLoader fxmlLoader = new FXMLLoader(
-                    GameApplication.class.getResource("/org/example/snakegame/views/game-view-custom-titlebar.fxml")
-            );
+                    GameApplication.class.getResource("/org/example/snakegame/views/game-view-custom-titlebar.fxml"));
 
             // Créer la nouvelle scène du menu
             Scene menuScene = new Scene(fxmlLoader.load(), CANVAS_WIDTH, CANVAS_HEIGHT);
@@ -128,8 +126,8 @@ public class GameApplication extends Application {
             // Charger les styles CSS
             menuScene.getStylesheets().addAll(
                     GameApplication.class.getResource("/org/example/snakegame/styles/styles.css").toExternalForm(),
-                    GameApplication.class.getResource("/org/example/snakegame/styles/menu-styles.css").toExternalForm()
-            );
+                    GameApplication.class.getResource("/org/example/snakegame/styles/menu-styles.css")
+                            .toExternalForm());
 
             // Changer la scène du stage principal
             if (primaryStage != null) {
@@ -138,12 +136,13 @@ public class GameApplication extends Application {
                 primaryStage.setResizable(false); // Taille fixe pour un aspect rétro
                 primaryStage.centerOnScreen();
 
-                System.out.println("🔙 Retour au menu principal (sans splash)");
+                GameLogger logger = GameLogger.getLogger(GameApplication.class);
+                logger.info("\ud83d\udd19 Retour au menu principal (sans splash)");
             }
 
         } catch (IOException e) {
-            System.err.println("❌ Erreur lors du retour au menu: " + e.getMessage());
-            e.printStackTrace();
+            GameLogger logger = GameLogger.getLogger(GameApplication.class);
+            logger.error("\u274c Erreur lors du retour au menu: %s", e.getMessage());
         }
     }
 
@@ -184,7 +183,8 @@ public class GameApplication extends Application {
     public static void main(String[] args) {
         // Hook pour sauvegarder à l'arrêt brutal du programme
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            System.out.println("🛑 Arrêt d'urgence détecté, sauvegarde des scores...");
+            GameLogger logger = GameLogger.getLogger(GameApplication.class);
+            logger.info("🛑 Arrêt d'urgence détecté, sauvegarde des scores...");
             ScoreManager.getInstance().forceSave();
 
             // Nettoyer l'audio si possible

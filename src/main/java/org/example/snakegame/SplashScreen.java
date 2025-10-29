@@ -15,6 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import org.example.snakegame.common.GameLogger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ import java.util.Random;
  */
 public class SplashScreen {
 
-
+    private final GameLogger logger = GameLogger.getLogger(SplashScreen.class);
     private Stage splashStage;
     private ProgressBar progressBar;
     private Label statusLabel;
@@ -159,7 +160,7 @@ public class SplashScreen {
                     getClass().getResource("/org/example/snakegame/styles/splash-styles.css").toExternalForm()
             );
         } catch (Exception e) {
-            System.err.println("⚠️ Impossible de charger splash-styles.css: " + e.getMessage());
+            logger.warn("⚠️ Impossible de charger splash-styles.css: %s", e.getMessage());
         }
 
         // Configurer le stage
@@ -183,17 +184,17 @@ public class SplashScreen {
         try {
             // Charger l'image icon2.png avec vérification null
             java.io.InputStream imageStream = getClass().getResourceAsStream("/org/example/snakegame/images/icon2.png");
-            
+
             if (imageStream == null) {
-                System.err.println("⚠️ Fichier icon2.png introuvable dans les ressources");
+                logger.warn("⚠️ Fichier icon2.png introuvable dans les ressources");
                 return createFallbackLogoView();
             }
 
             Image logoImage = new Image(imageStream);
-            
+
             // Vérifier que l'image est valide
             if (logoImage.isError()) {
-                System.err.println("⚠️ Erreur lors du chargement de icon2.png: " + logoImage.getException().getMessage());
+                logger.warn("⚠️ Erreur lors du chargement de icon2.png: %s", logoImage.getException().getMessage());
                 return createFallbackLogoView();
             }
 
@@ -206,12 +207,11 @@ public class SplashScreen {
             // Effet de brillance rétro amélioré
             logoView.getStyleClass().addAll("splash-logo", "glow-text-pink");
 
-            System.out.println("✅ Logo icon2.png chargé avec succès");
+            logger.debug("✅ Logo icon2.png chargé avec succès");
             return logoView;
 
         } catch (Exception e) {
-            System.err.println("⚠️ Exception lors du chargement de icon2.png: " + e.getMessage());
-            e.printStackTrace();
+            logger.warn("⚠️ Exception lors du chargement de icon2.png: %s", e.getMessage());
             return createFallbackLogoView();
         }
     }
@@ -220,7 +220,7 @@ public class SplashScreen {
      * Créer un logo de secours si l'image n'est pas disponible
      */
     private ImageView createFallbackLogoView() {
-        System.out.println("🔄 Utilisation du logo de secours...");
+        logger.info("🔄 Utilisation du logo de secours...");
 
         // Fallback: créer une ImageView vide mais stylée
         ImageView fallbackView = new ImageView();
@@ -310,7 +310,7 @@ public class SplashScreen {
 
             Platform.runLater(() -> {
                 statusLabel.setText(step.message);
-                System.out.println("🔄 " + step.message);
+                logger.debug("🔄 %s", step.message);
             });
 
             // Effectuer le véritable chargement selon l'étape
@@ -358,7 +358,7 @@ public class SplashScreen {
      */
     private void initializeSystem() {
         // Vérifier la compatibilité JavaFX
-        System.out.println("   ✓ JavaFX Runtime vérifié");
+        logger.debug("   ✓ JavaFX Runtime vérifié");
 
         // Initialiser les gestionnaires de base
         try {
@@ -374,15 +374,15 @@ public class SplashScreen {
             MusicController musicController = MusicController.getInstance();
             if (!musicController.isInitialized()) {
                 musicController.initialize();
-                System.out.println("   ✓ Système audio initialisé");
+                logger.debug("   ✓ Système audio initialisé");
             } else {
-                System.out.println("   ✓ Système audio déjà initialisé");
+                logger.debug("   ✓ Système audio déjà initialisé");
             }
 
             // Petite pause pour simuler le chargement
             Thread.sleep(300);
         } catch (Exception e) {
-            System.err.println("   ⚠️ Erreur audio: " + e.getMessage());
+            logger.warn("   ⚠️ Erreur audio: %s", e.getMessage());
             // Continue quand même, l'audio n'est pas critique
         }
     }
@@ -393,10 +393,10 @@ public class SplashScreen {
             // Force le chargement des classes
             Class.forName("org.example.snakegame.snake.SnakeGame");
             Class.forName("org.example.snakegame.pong.PongGame");
-            System.out.println("   ✓ Classes de jeu préchargées");
+            logger.debug("   ✓ Classes de jeu préchargées");
             Thread.sleep(400);
         } catch (Exception e) {
-            System.err.println("   ⚠️ Erreur préchargement: " + e.getMessage());
+            logger.warn("   ⚠️ Erreur préchargement: %s", e.getMessage());
         }
     }
 
@@ -404,10 +404,10 @@ public class SplashScreen {
         // Initialiser le ScoreManager
         try {
             ScoreManager scoreManager = ScoreManager.getInstance();
-            System.out.println("   ✓ Scores chargés: " + scoreManager.getTotalGamesPlayed() + " parties");
+            logger.debug("   ✓ Scores chargés: %d parties", scoreManager.getTotalGamesPlayed());
             Thread.sleep(200);
         } catch (Exception e) {
-            System.err.println("   ⚠️ Erreur scores: " + e.getMessage());
+            logger.warn("   ⚠️ Erreur scores: %s", e.getMessage());
         }
     }
 
@@ -415,7 +415,7 @@ public class SplashScreen {
         // Précharger les styles CSS
         try {
             Thread.sleep(300);
-            System.out.println("   ✓ Interface utilisateur préparée");
+            logger.debug("   ✓ Interface utilisateur préparée");
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -425,7 +425,7 @@ public class SplashScreen {
         // Dernières vérifications
         try {
             Thread.sleep(150);
-            System.out.println("   ✓ Retro Arcade prêt !");
+            logger.info("   ✓ Retro Arcade prêt !");
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

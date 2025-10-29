@@ -3,6 +3,7 @@ module org.example.snakegame {
     requires javafx.controls;
     requires javafx.fxml;
     requires javafx.media;
+    requires java.logging;
 
     // Exporter tous nos packages pour JavaFX
     exports org.example.snakegame;
