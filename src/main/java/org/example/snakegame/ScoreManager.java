@@ -10,11 +10,11 @@ import org.example.snakegame.common.GameLogger;
 
 /**
  * Gestionnaire global des scores avec sauvegarde persistante locale
- * Singleton qui persiste les scores entre les parties, les jeux et les sessions
+ * Enum Singleton (meilleure pratique Java - thread-safe, protection réflexion/sérialisation)
  */
-public class ScoreManager {
+public enum ScoreManager {
+    INSTANCE;
 
-    private static ScoreManager instance;
     private final GameLogger logger = GameLogger.getLogger(ScoreManager.class);
 
     // Nom du fichier de sauvegarde
@@ -40,23 +40,9 @@ public class ScoreManager {
     private String lastSessionDate = "";
     private int totalGamesPlayed = 0;
 
-    // Constructeur privé pour Singleton
-    private ScoreManager() {
+    // Constructeur de l'enum (appelé automatiquement une seule fois)
+    ScoreManager() {
         loadScores(); // Charger les scores au démarrage
-    }
-
-    /**
-     * Obtenir l'instance unique du ScoreManager (thread-safe avec double-checked locking)
-     */
-    public static ScoreManager getInstance() {
-        if (instance == null) {
-            synchronized (ScoreManager.class) {
-                if (instance == null) {
-                    instance = new ScoreManager();
-                }
-            }
-        }
-        return instance;
     }
 
     // === MÉTHODES SNAKE ===

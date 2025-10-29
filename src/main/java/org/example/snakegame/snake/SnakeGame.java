@@ -48,7 +48,7 @@ public class SnakeGame extends Application implements Game {
     @Override
     public void start(Stage primaryStage) {
         // Initialiser le gestionnaire de scores
-        scoreManager = ScoreManager.getInstance();
+        scoreManager = ScoreManager.INSTANCE;
 
         // Configuration de la fenêtre
         primaryStage.setTitle("🐍 SNAKE GAME - Retro Arcade");

@@ -48,7 +48,7 @@ public class GameController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         // Initialiser le gestionnaire de scores
-        scoreManager = ScoreManager.getInstance();
+        scoreManager = ScoreManager.INSTANCE;
 
         // Charger les high scores sauvegardés
         loadHighScores();

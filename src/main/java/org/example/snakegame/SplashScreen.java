@@ -403,7 +403,7 @@ public class SplashScreen {
     private void loadScores() {
         // Initialiser le ScoreManager
         try {
-            ScoreManager scoreManager = ScoreManager.getInstance();
+            ScoreManager scoreManager = ScoreManager.INSTANCE;
             logger.debug("   ✓ Scores chargés: %d parties", scoreManager.getTotalGamesPlayed());
             Thread.sleep(200);
         } catch (Exception e) {

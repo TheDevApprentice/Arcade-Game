@@ -32,7 +32,7 @@ public class GameApplication extends Application {
         primaryStage = stage;
 
         // Initialiser les gestionnaires
-        scoreManager = ScoreManager.getInstance();
+        scoreManager = ScoreManager.INSTANCE;
         musicController = MusicController.getInstance();
 
         logger.info("🎮 Retro Arcade - Démarrage...");
@@ -167,14 +167,14 @@ public class GameApplication extends Application {
      * Méthode pour sauvegarder les scores depuis l'extérieur
      */
     public static void saveScores() {
-        ScoreManager.getInstance().forceSave();
+        ScoreManager.INSTANCE.forceSave();
     }
 
     /**
      * Méthode pour exporter les scores
      */
     public static void exportScores() {
-        ScoreManager.getInstance().exportScores();
+        ScoreManager.INSTANCE.exportScores();
     }
 
     /**
@@ -185,7 +185,7 @@ public class GameApplication extends Application {
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             GameLogger logger = GameLogger.getLogger(GameApplication.class);
             logger.info("🛑 Arrêt d'urgence détecté, sauvegarde des scores...");
-            ScoreManager.getInstance().forceSave();
+            ScoreManager.INSTANCE.forceSave();
 
             // Nettoyer l'audio si possible
             try {
