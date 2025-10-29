@@ -109,14 +109,63 @@ jobs:
         name: RetroArcade-Windows-Package
         path: target/RetroArcade-Windows.zip
         
-    - name: Create Release (only if tag exists)
-      if: startsWith(github.ref, 'refs/tags/')
+    - name: Generate release tag
+      id: tag
+      run: |
+        echo "release_tag=build-$(date +'%Y%m%d-%H%M%S')" >> $GITHUB_OUTPUT
+      shell: bash
+        
+    - name: Create Release
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
       uses: softprops/action-gh-release@v1
       with:
+        tag_name: ${{ steps.tag.outputs.release_tag }}
+        name: "RetroArcade Build ${{ steps.tag.outputs.release_tag }}"
+        body: |
+          🎮 **Retro Arcade - Windows Build**
+          
+          Automatic build from commit: ${{ github.sha }}
+          
+          ### 📦 Installation
+          1. Download `RetroArcade-1.0.exe`
+          2. Run the installer
+          3. Play! (No Java required)
+          
+          ### ✨ Features
+          - Snake Game with neon effects
+          - Pong Game with adjustable AI
+          - Automatic score saving
+          - Retro music and sound effects
+          
+          Built with ❤️ by GitHub Actions
         files: |
           target/dist/*.exe
           target/RetroArcade-Windows.zip
         draft: false
         prerelease: false
+        make_latest: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Publish Package to GitHub Packages
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: |
+        # Configuration Maven pour GitHub Packages
+        mkdir -p ~/.m2
+        cat > ~/.m2/settings.xml << 'EOF'
+        <settings>
+          <servers>
+            <server>
+              <id>github</id>
+              <username>${{ github.actor }}</username>
+              <password>${{ secrets.GITHUB_TOKEN }}</password>
+            </server>
+          </servers>
+        </settings>
+        EOF
+        
+        # Deploy vers GitHub Packages
+        mvn deploy -DskipTests
+      shell: bash
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
