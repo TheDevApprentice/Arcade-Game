@@ -2,14 +2,15 @@
 
 <div align="center">
 
-![Java](https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=java)
-![JavaFX](https://img.shields.io/badge/JavaFX-17.0.6-blue?style=for-the-badge&logo=java)
-![Maven](https://img.shields.io/badge/Maven-3.x-red?style=for-the-badge&logo=apache-maven)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+[![Java](https://img.shields.io/badge/Java-17-orange?style=for-the-badge&logo=java)](https://www.oracle.com/java/technologies/javase-jdk17-downloads.html)
+[![JavaFX](https://img.shields.io/badge/JavaFX-17.0.6-blue?style=for-the-badge&logo=java)](https://openjfx.io/)
+[![Maven](https://img.shields.io/badge/Maven-3.x-red?style=for-the-badge&logo=apache-maven)](https://maven.apache.org/)
+[![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
+[![Build Status](https://img.shields.io/badge/Build-Automatic-brightgreen?style=for-the-badge&logo=github-actions)](https://github.com/your-username/arcade-game/actions)
 
 Une collection de jeux d'arcade rétro développée en JavaFX avec une interface néon stylisée, un système de scores persistant et une ambiance musicale immersive.
 
-[Fonctionnalités](#-fonctionnalités) • [Installation](#-installation) • [Utilisation](#-utilisation) • [Architecture](#-architecture) • [Développement](#-développement)
+[Fonctionnalités](#-fonctionnalités) • [Installation](#-installation) • [Utilisation](#-utilisation) • [Architecture](#-architecture) • [Développement](#-développement) • [📦 Build & Distribution](#-build-et-distribution)
 
 </div>
 
@@ -571,7 +572,13 @@ Les contributions sont les bienvenues ! Voici comment participer:
 1. **Fork** le projet
 2. **Créer une branche** (`git checkout -b feature/AmazingFeature`)
 3. **Commit** vos changements (`git commit -m 'Add AmazingFeature'`)
-4. **Push** vers la branche (`git push origin feature/AmazingFeature`)
+4. **Push sur la branche `features`**
+```bash
+git checkout features
+git add .
+git commit -m "feat: nouvelle fonctionnalité"
+git push origin features
+```
 5. **Ouvrir une Pull Request**
 
 ### Guidelines
