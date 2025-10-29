@@ -11,12 +11,12 @@ import java.util.Map;
 
 /**
  * Gestionnaire global de la musique et des effets sonores
- * Singleton qui gère tous les assets audio du jeu Retro Arcade
+ * Enum Singleton (meilleure pratique Java - thread-safe, protection réflexion/sérialisation)
  * Version refactorisée avec logging structuré
  */
-public class MusicController {
+public enum MusicController {
+    INSTANCE;
 
-    private static MusicController instance;
     private final GameLogger logger;
 
     // MediaPlayers pour la musique d'ambiance (en boucle)
@@ -94,26 +94,12 @@ public class MusicController {
     }
 
     /**
-     * Constructeur privé pour Singleton
+     * Constructeur de l'enum (appelé automatiquement une seule fois)
      */
-    private MusicController() {
+    MusicController() {
         this.logger = GameLogger.getLogger(MusicController.class);
         soundEffects = new HashMap<>();
         backgroundMusics = new HashMap<>();
-    }
-
-    /**
-     * Obtenir l'instance unique du MusicController (thread-safe avec double-checked locking)
-     */
-    public static MusicController getInstance() {
-        if (instance == null) {
-            synchronized (MusicController.class) {
-                if (instance == null) {
-                    instance = new MusicController();
-                }
-            }
-        }
-        return instance;
     }
 
     /**

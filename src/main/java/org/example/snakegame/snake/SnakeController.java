@@ -60,7 +60,7 @@ public class SnakeController extends AbstractGameController {
         ValidationUtils.requireNonNull(gc, "graphicsContext");
         this.renderer = new SnakeRenderer(gc, CELL_SIZE, BOARD_WIDTH, BOARD_HEIGHT);
         this.scoreManager = ScoreManager.INSTANCE;
-        this.musicController = MusicController.getInstance();
+        this.musicController = MusicController.INSTANCE;
         this.previousScore = 0;
 
         // Initialiser le jeu

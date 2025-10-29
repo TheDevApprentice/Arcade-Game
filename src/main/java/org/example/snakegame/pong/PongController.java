@@ -66,7 +66,7 @@ public class PongController extends AbstractGameController {
         ValidationUtils.requireNonNull(gc, "graphicsContext");
         this.renderer = new PongRenderer(gc, CANVAS_WIDTH, CANVAS_HEIGHT, WINNING_SCORE);
         this.scoreManager = ScoreManager.INSTANCE;
-        this.musicController = MusicController.getInstance();
+        this.musicController = MusicController.INSTANCE;
         this.pressedKeys = new HashSet<>();
         this.previousPlayer1Score = 0;
         this.previousPlayer2Score = 0;

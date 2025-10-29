@@ -371,7 +371,7 @@ public class SplashScreen {
     private void initializeAudio() {
         // Initialiser le MusicController
         try {
-            MusicController musicController = MusicController.getInstance();
+            MusicController musicController = MusicController.INSTANCE;
             if (!musicController.isInitialized()) {
                 musicController.initialize();
                 logger.debug("   ✓ Système audio initialisé");

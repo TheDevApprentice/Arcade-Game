@@ -87,7 +87,7 @@ public class GameController implements Initializable {
                     logger.info("%s", scoreManager.getScoreSummary());
                     
                     // Nettoyer l'audio
-                    MusicController.getInstance().cleanup();
+                    MusicController.INSTANCE.cleanup();
                     
                     // Forcer la sauvegarde des scores
                     scoreManager.forceSave();

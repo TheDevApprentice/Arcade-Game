@@ -33,7 +33,7 @@ public class GameApplication extends Application {
 
         // Initialiser les gestionnaires
         scoreManager = ScoreManager.INSTANCE;
-        musicController = MusicController.getInstance();
+        musicController = MusicController.INSTANCE;
 
         logger.info("🎮 Retro Arcade - Démarrage...");
 
@@ -189,7 +189,7 @@ public class GameApplication extends Application {
 
             // Nettoyer l'audio si possible
             try {
-                MusicController.getInstance().cleanup();
+                MusicController.INSTANCE.cleanup();
             } catch (Exception e) {
                 // Ignorer les erreurs de nettoyage au shutdown
             }
