@@ -35,23 +35,26 @@ Une collection de jeux d'arcade rétro développée en JavaFX avec une interface
 
 ---
 
-## 🎮 Vue d'ensemble
+## Vue d'ensemble
 
 **Retro Arcade** est une application de jeux d'arcade classiques développée en Java avec JavaFX. Le projet combine deux jeux emblématiques (Snake et Pong) dans une interface moderne avec une esthétique rétro néon inspirée des années 80.
 
 ### Points forts
 
-- 🎨 **Interface rétro-futuriste** avec effets néon et animations fluides
-- 💾 **Sauvegarde automatique** des scores avec système de backup
-- 🎵 **Système audio complet** avec musiques d'ambiance et effets sonores
-- 🏆 **Statistiques détaillées** avec high scores, moyennes et historique
-- 🖥️ **Barre de titre personnalisée** avec fenêtre draggable
-- ⚡ **Splash screen animé** avec chargement progressif des ressources
-- 🎯 **Contrôles intuitifs** au clavier et à la souris
+- **Interface rétro-futuriste** avec effets néon et animations fluides
+- **Sauvegarde automatique** des scores avec système de backup
+- **Système audio complet** avec musiques d'ambiance et effets sonores
+- **Statistiques détaillées** avec high scores, moyennes et historique
+- **Barre de titre personnalisée** avec fenêtre draggable
+- **Splash screen animé** avec chargement progressif des ressources
+- **Contrôles intuitifs** au clavier et à la souris
+- **Code SOLID** - Architecture respectant 100% des principes SOLID
+- **Architecture modulaire** - Séparation claire des responsabilités (SRP)
+- **Extensible** - Interface Game pour ajouter facilement de nouveaux jeux
 
 ---
 
-## ✨ Fonctionnalités
+## Fonctionnalités
 
 ### Système de jeu
 
