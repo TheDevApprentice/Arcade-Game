@@ -32,56 +32,70 @@ jobs:
       run: mvn clean package -DskipTests
       
     - name: Setup jpackage
+      shell: pwsh
       run: |
-        # jpackage est inclus avec JDK 17+
-        echo "jpackage disponible avec JDK 17"
+        Write-Host "jpackage available with JDK 17+"
         jpackage --version
+        New-Item -ItemType Directory -Force -Path "target/dist" | Out-Null
         
     - name: Create Windows executable with jpackage
+      shell: pwsh
       run: |
-        jpackage ^
-          --name "RetroArcade" ^
-          --input "target/classes" ^
-          --main-jar "arcade-game-1.0-SNAPSHOT.jar" ^
-          --main-class "org.example.snakegame.GameApplication" ^
-          --type "exe" ^
-          --win-dir-chooser ^
-          --win-shortcut ^
-          --win-menu ^
-          --win-menu-group "Retro Games" ^
-          --app-version "1.0" ^
-          --vendor "Retro Arcade Team" ^
-          --copyright "Copyright 2024 Retro Arcade Team" ^
-          --description "Classic Snake and Pong games with retro style" ^
-          --icon "src/main/resources/icon.ico" ^
-          --dest "target/dist" ^
-          --verbose
+        $commonArgs = @(
+          "--name", "RetroArcade",
+          "--input", "target",
+          "--main-jar", "arcade-game-executable.jar",
+          "--main-class", "org.example.snakegame.GameApplication",
+          "--type", "exe",
+          "--win-dir-chooser",
+          "--win-shortcut",
+          "--win-menu",
+          "--win-menu-group", "Retro Games",
+          "--app-version", "1.0",
+          "--vendor", "Retro Arcade Team",
+          "--copyright", "Copyright 2024 Retro Arcade Team",
+          "--description", "Classic Snake and Pong games with retro style",
+          "--dest", "target/dist",
+          "--verbose"
+        )
+
+        if (Test-Path "src/main/resources/icon.ico") {
+          $commonArgs += @("--icon", "src/main/resources/icon.ico")
+        }
+
+        jpackage @commonArgs
       continue-on-error: true
       
     - name: Create Windows executable (fallback without icon)
       if: failure()
+      shell: pwsh
       run: |
-        jpackage ^
-          --name "RetroArcade" ^
-          --input "target/classes" ^
-          --main-jar "arcade-game-1.0-SNAPSHOT.jar" ^
-          --main-class "org.example.snakegame.GameApplication" ^
-          --type "exe" ^
-          --win-dir-chooser ^
-          --win-shortcut ^
-          --win-menu ^
-          --win-menu-group "Retro Games" ^
-          --app-version "1.0" ^
-          --vendor "Retro Arcade Team" ^
-          --copyright "Copyright 2024 Retro Arcade Team" ^
-          --description "Classic Snake and Pong games with retro style" ^
-          --dest "target/dist" ^
-          --verbose
+        $args = @(
+          "--name", "RetroArcade",
+          "--input", "target",
+          "--main-jar", "arcade-game-executable.jar",
+          "--main-class", "org.example.snakegame.GameApplication",
+          "--type", "exe",
+          "--win-dir-chooser",
+          "--win-shortcut",
+          "--win-menu",
+          "--win-menu-group", "Retro Games",
+          "--app-version", "1.0",
+          "--vendor", "Retro Arcade Team",
+          "--copyright", "Copyright 2024 Retro Arcade Team",
+          "--description", "Classic Snake and Pong games with retro style",
+          "--dest", "target/dist",
+          "--verbose"
+        )
+        jpackage @args
           
     - name: Create ZIP package
+      shell: pwsh
       run: |
-        cd target/dist
-        7z a -tzip ../RetroArcade-Windows.zip *
+        if (!(Test-Path "target/dist")) {
+          throw "target/dist directory not found. jpackage may have failed."
+        }
+        Compress-Archive -Path "target/dist/*" -DestinationPath "target/RetroArcade-Windows.zip" -Force
         
     - name: Upload executable as artifact
       uses: actions/upload-artifact@v4
