@@ -223,7 +223,7 @@ public class SnakeRenderer {
         drawFood(food);
         
         // Dessiner le score
-        drawScore(score, highScore, foodEaten);
+        // drawScore(score, highScore, foodEaten);
         
         // Dessiner les messages d'état
         drawStatusMessage(gameState);

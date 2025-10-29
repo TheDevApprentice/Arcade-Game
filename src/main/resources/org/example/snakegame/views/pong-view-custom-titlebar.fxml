@@ -8,8 +8,7 @@
 <?import javafx.scene.canvas.Canvas?>
 
 <VBox xmlns="http://javafx.com/javafx/11.0.1"
-      xmlns:fx="http://javafx.com/fxml/1"
-      fx:controller="org.example.snakegame.pong.PongGame">
+      xmlns:fx="http://javafx.com/fxml/1">
 
     <!-- BARRE DE TITRE CUSTOM -->
     <HBox fx:id="titleBar" styleClass="custom-titlebar" alignment="CENTER_LEFT" spacing="10.0">

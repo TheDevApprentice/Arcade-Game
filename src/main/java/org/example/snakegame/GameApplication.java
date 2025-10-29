@@ -2,7 +2,9 @@ package org.example.snakegame;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.example.snakegame.common.GameLogger;
@@ -16,7 +18,9 @@ import java.io.IOException;
 public class GameApplication extends Application {
 
     private static final int CANVAS_WIDTH = 800;
-    private static final int CANVAS_HEIGHT = 780;
+    // Calculer la hauteur en fonction de l'écran (80% de la hauteur disponible)
+    private static final double SCREEN_HEIGHT_RATIO = 1;
+    private static int CANVAS_HEIGHT;
 
     private static Stage primaryStage;
     private ScoreManager scoreManager;
@@ -31,11 +35,17 @@ public class GameApplication extends Application {
     public void start(Stage stage) throws IOException {
         primaryStage = stage;
 
+        // Calculer la hauteur en fonction de l'écran
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        CANVAS_HEIGHT = (int) (screenBounds.getHeight() * SCREEN_HEIGHT_RATIO);
+        
         // Initialiser les gestionnaires
         scoreManager = ScoreManager.INSTANCE;
         musicController = MusicController.INSTANCE;
 
         logger.info("🎮 Retro Arcade - Démarrage...");
+        logger.info("📺 Résolution écran: %.0fx%.0f, Fenêtre: %dx%d", 
+                screenBounds.getWidth(), screenBounds.getHeight(), CANVAS_WIDTH, CANVAS_HEIGHT);
 
         if (isFirstLaunch) {
             // Premier démarrage : afficher le splash screen
@@ -151,6 +161,20 @@ public class GameApplication extends Application {
      */
     public static Stage getPrimaryStage() {
         return primaryStage;
+    }
+
+    /**
+     * Méthode pour obtenir la hauteur calculée de la fenêtre
+     */
+    public static int getCanvasHeight() {
+        return CANVAS_HEIGHT;
+    }
+
+    /**
+     * Méthode pour obtenir la largeur de la fenêtre
+     */
+    public static int getCanvasWidth() {
+        return CANVAS_WIDTH;
     }
 
     /**
