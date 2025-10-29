@@ -28,6 +28,11 @@ public class SnakeController extends AbstractGameController {
     private static final int BOARD_WIDTH = 40;  // 800px / 20px
     private static final int BOARD_HEIGHT = 30; // 600px / 20px
     private static final int INITIAL_GAME_SPEED = 120; // Réduit pour plus de fluidité
+    
+    // Constantes pour l'accélération du jeu
+    private static final int SPEED_INCREASE_THRESHOLD = 5; // Tous les 5 aliments
+    private static final int SPEED_DECREASE_AMOUNT = 8; // Réduction de vitesse en ms
+    private static final int MIN_GAME_SPEED = 60; // Vitesse minimale (= vitesse max)
 
     // État du jeu (gameState et gameLoop sont dans AbstractGameController)
     private final GraphicsContext gc;
@@ -185,9 +190,11 @@ public class SnakeController extends AbstractGameController {
         } else {
             musicController.playSnakeSpecialFood();
         }
-        // Augmenter la vitesse tous les 5 aliments normaux (plus progressif)
-        if (food.getType() == Food.FoodType.NORMAL && foodEaten % 5 == 0 && gameSpeed > 60) {
-            gameSpeed -= 8; // Réduction plus douce
+        // Augmenter la vitesse tous les SPEED_INCREASE_THRESHOLD aliments normaux
+        if (food.getType() == Food.FoodType.NORMAL && 
+            foodEaten % SPEED_INCREASE_THRESHOLD == 0 && 
+            gameSpeed > MIN_GAME_SPEED) {
+            gameSpeed -= SPEED_DECREASE_AMOUNT;
             logger.debug("Accélération: nouvelle vitesse %dms", gameSpeed);
             updateGameSpeed();
         }
