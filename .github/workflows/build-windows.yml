@@ -109,8 +109,8 @@ jobs:
         name: RetroArcade-Windows-Package
         path: target/RetroArcade-Windows.zip
         
-    - name: Create Release (if on main branch)
-      if: github.ref == 'refs/heads/main'
+    - name: Create Release (only if tag exists)
+      if: startsWith(github.ref, 'refs/tags/')
       uses: softprops/action-gh-release@v1
       with:
         files: |
@@ -118,6 +118,5 @@ jobs:
           target/RetroArcade-Windows.zip
         draft: false
         prerelease: false
-        generate_release_notes: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
