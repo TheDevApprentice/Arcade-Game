@@ -12,6 +12,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.example.snakegame.GameController;
 import org.example.snakegame.ScoreManager;
+import org.example.snakegame.common.GameEventListener;
+import org.example.snakegame.common.GameResult;
 
 /**
  * Jeu Snake - Version corrigée avec synchronisation des boutons
@@ -68,9 +70,19 @@ public class SnakeGame extends Application {
         GraphicsContext gc = gameCanvas.getGraphicsContext2D();
         snakeController = new SnakeController(gc);
 
-        // Configurer les callbacks
-        snakeController.setScoreUpdateCallback(this::updateScoreDisplay);
-        snakeController.setGameOverCallback(this::onGameOver);
+        // Configurer les callbacks avec les nouvelles interfaces
+        snakeController.setScoreUpdateListener((newScore, delta) -> updateScoreDisplay());
+        snakeController.setGameEventListener(new GameEventListener() {
+            @Override
+            public void onScoreUpdate(int newScore) {
+                updateScoreDisplay();
+            }
+
+            @Override
+            public void onGameOver(GameResult result) {
+                onGameOverEvent(result);
+            }
+        });
 
         // Gestion des touches - CORRIGÉ
         scene.setOnKeyPressed(event -> {
@@ -278,14 +290,15 @@ public class SnakeGame extends Application {
     }
 
     /**
-     * Callback appelé lors du game over
+     * Callback appelé lors du game over avec GameResult
      */
-    private void onGameOver() {
+    private void onGameOverEvent(GameResult result) {
         updateScoreDisplay();
-        System.out.println("Game Over ! Score final: " + snakeController.getScore());
+        System.out.println("Game Over ! Score final: " + result.getFinalScore());
         System.out.println("Score enregistré dans ScoreManager: " + scoreManager.getSnakeTotalScore());
-
-        // Optionnel: effet sonore, animation, etc.
+        if (result.hasStatistics()) {
+            System.out.println("Statistiques: " + result.getStatistics());
+        }
     }
 
     /**

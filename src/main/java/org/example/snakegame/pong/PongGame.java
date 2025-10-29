@@ -12,6 +12,8 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import org.example.snakegame.GameController;
 import org.example.snakegame.ScoreManager;
+import org.example.snakegame.common.GameEventListener;
+import org.example.snakegame.common.GameResult;
 
 /**
  * Jeu Pong - Version corrigée avec synchronisation des boutons
@@ -43,7 +45,7 @@ public class PongGame extends Application {
         scoreManager = ScoreManager.getInstance();
 
         // Configuration de la fenêtre
-        primaryStage.setTitle("🏓 PONG GAME - Retro Arcade");
+        primaryStage.setTitle(" PONG GAME - Retro Arcade");
 
         // Créer l'interface
         VBox root = createGameInterface();
@@ -66,9 +68,19 @@ public class PongGame extends Application {
         GraphicsContext gc = gameCanvas.getGraphicsContext2D();
         pongController = new PongController(gc);
 
-        // Configurer les callbacks
-        pongController.setScoreUpdateCallback(this::updateScoreDisplay);
-        pongController.setGameOverCallback(this::onGameOver);
+        // Configurer les callbacks avec les nouvelles interfaces
+        pongController.setScoreUpdateListener((newScore, delta) -> updateScoreDisplay());
+        pongController.setGameEventListener(new GameEventListener() {
+            @Override
+            public void onScoreUpdate(int newScore) {
+                updateScoreDisplay();
+            }
+
+            @Override
+            public void onGameOver(GameResult result) {
+                onGameOverEvent(result);
+            }
+        });
 
         // Gestion des touches - CORRIGÉ
         scene.setOnKeyPressed(event -> {
@@ -273,16 +285,15 @@ public class PongGame extends Application {
     }
 
     /**
-     * Callback appelé lors de la fin de partie
+     * Callback appelé lors de la fin de partie avec GameResult
      */
-    private void onGameOver() {
+    private void onGameOverEvent(GameResult result) {
         updateScoreDisplay();
-        String winner = pongController.getPlayer1Score() >= 5 ? "Joueur 1" : "IA";
-        System.out.println("Victoire de " + winner + " ! Score: " +
-                pongController.getPlayer1Score() + "-" + pongController.getPlayer2Score());
+        System.out.println("Victoire ! Score final: " + result.getFinalScore());
         System.out.println("Score global Pong: " + scoreManager.getPongScore());
-
-        // Optionnel: effet sonore, animation, etc.
+        if (result.hasStatistics()) {
+            System.out.println("Statistiques: " + result.getStatistics());
+        }
     }
 
     /**
