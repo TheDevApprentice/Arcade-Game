@@ -7,7 +7,7 @@
 [![Maven](https://img.shields.io/badge/Maven-3.x-red?style=for-the-badge&logo=apache-maven)](https://maven.apache.org/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 [![Build Status](https://img.shields.io/badge/Build-Automatic-brightgreen?style=for-the-badge&logo=github-actions)](https://github.com/TheDevApprentice/arcade-game/actions)
-
+[![Build Windows Executable](https://github.com/TheDevApprentice/Arcade-Game/actions/workflows/build-windows.yml/badge.svg?branch=main)](https://github.com/TheDevApprentice/Arcade-Game/actions/workflows/build-windows.yml)
 Une collection de jeux d'arcade rétro développée en JavaFX avec une interface néon stylisée, un système de scores persistant et une ambiance musicale immersive.
 
 [Fonctionnalités](#-fonctionnalités) • [Installation](#-installation) • [Utilisation](#-utilisation) • [Architecture](#-architecture) • [Développement](#-développement) • [📦 Build & Distribution](#-build-et-distribution)
