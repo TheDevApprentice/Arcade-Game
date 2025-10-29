@@ -17,8 +17,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Contrôleur du jeu Pong utilisant les objets Ball et Paddle
- * Version refactorisée avec logging structuré et validation
+ * Contrôleur du jeu Pong
+ * Version refactorisée avec logging structuré, validation et SRP
+ * Le rendu est délégué à PongRenderer (SRP)
  */
 public class PongController extends AbstractGameController {
 
@@ -34,6 +35,9 @@ public class PongController extends AbstractGameController {
     // État du jeu (gameState est dans AbstractGameController)
     private Timeline gameLoop;
     private final GraphicsContext gc;
+    
+    // Renderer dédié (SRP)
+    private final PongRenderer renderer;
 
     // Objets du jeu
     private Ball ball;
@@ -62,9 +66,10 @@ public class PongController extends AbstractGameController {
     public PongController(GraphicsContext gc) {
         super(PongController.class);
         this.gc = ValidationUtils.requireNonNull(gc, "graphicsContext");
-        this.pressedKeys = new HashSet<>();
+        this.renderer = new PongRenderer(gc, CANVAS_WIDTH, CANVAS_HEIGHT, WINNING_SCORE);
         this.scoreManager = ScoreManager.getInstance();
         this.musicController = MusicController.getInstance();
+        this.pressedKeys = new HashSet<>();
         this.previousPlayer1Score = 0;
         this.previousPlayer2Score = 0;
 

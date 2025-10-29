@@ -16,8 +16,9 @@ import org.example.snakegame.common.Point;
 import org.example.snakegame.common.ValidationUtils;
 
 /**
- * Contrôleur du jeu Snake utilisant les objets Snake et Food
- * Version refactorisée avec logging structuré et validation
+ * Contrôleur du jeu Snake
+ * Version refactorisée avec logging structuré, validation et SRP
+ * Le rendu est délégué à SnakeRenderer (SRP)
  */
 public class SnakeController extends AbstractGameController {
 
@@ -31,6 +32,9 @@ public class SnakeController extends AbstractGameController {
     // État du jeu (gameState est dans AbstractGameController)
     private Timeline gameLoop;
     private final GraphicsContext gc;
+    
+    // Renderer dédié (SRP)
+    private final SnakeRenderer renderer;
 
     // Objets du jeu
     private Snake snake;
@@ -51,6 +55,7 @@ public class SnakeController extends AbstractGameController {
     public SnakeController(GraphicsContext gc) {
         super(SnakeController.class);
         this.gc = ValidationUtils.requireNonNull(gc, "graphicsContext");
+        this.renderer = new SnakeRenderer(gc, CELL_SIZE, BOARD_WIDTH, BOARD_HEIGHT);
         this.scoreManager = ScoreManager.getInstance();
         this.musicController = MusicController.getInstance();
         this.previousScore = 0;
@@ -335,179 +340,22 @@ public class SnakeController extends AbstractGameController {
     }
 
     /**
-     * Rendu graphique principal (inchangé mais optimisé)
+     * Rendu graphique principal - Délégation au renderer (SRP)
      */
     public void render() {
-        // Effacer le canvas
-        gc.setFill(Color.BLACK);
-        gc.fillRect(0, 0, BOARD_WIDTH * CELL_SIZE, BOARD_HEIGHT * CELL_SIZE);
-
-        // Dessiner la grille (optionnel, effet rétro)
-        drawGrid();
-
-        // Dessiner la nourriture
-        drawFood();
-
-        // Dessiner le serpent
-        drawSnake();
-
-        // Dessiner les messages d'état
-        drawStatusMessages();
-
-        // Bordure du jeu
-        drawBorder();
+        renderer.render(
+            snake, 
+            food, 
+            currentScore, 
+            scoreManager.getSnakeHighScore(), 
+            foodEaten, 
+            gameState
+        );
     }
 
-    /**
-     * Dessiner la grille de fond
-     */
-    private void drawGrid() {
-        gc.setStroke(Color.rgb(0, 50, 0));
-        gc.setLineWidth(0.5);
-
-        // Lignes verticales
-        for (int x = 0; x <= BOARD_WIDTH; x++) {
-            gc.strokeLine(x * CELL_SIZE, 0, x * CELL_SIZE, BOARD_HEIGHT * CELL_SIZE);
-        }
-
-        // Lignes horizontales
-        for (int y = 0; y <= BOARD_HEIGHT; y++) {
-            gc.strokeLine(0, y * CELL_SIZE, BOARD_WIDTH * CELL_SIZE, y * CELL_SIZE);
-        }
-    }
-
-    /**
-     * Dessiner le serpent
-     */
-    private void drawSnake() {
-        var body = snake.getBody();
-        for (int i = 0; i < body.size(); i++) {
-            Point segment = body.get(i);
-
-            if (i == 0) {
-                // Tête du serpent (plus brillante)
-                gc.setFill(Color.LIME);
-            } else {
-                // Corps du serpent (dégradé)
-                double alpha = 1.0 - (i * 0.1);
-                alpha = Math.max(alpha, 0.3);
-                gc.setFill(Color.rgb(0, (int)(255 * alpha), 0));
-            }
-
-            gc.fillRect(
-                    segment.x * CELL_SIZE,
-                    segment.y * CELL_SIZE,
-                    CELL_SIZE - 1,
-                    CELL_SIZE - 1
-            );
-        }
-    }
-
-    /**
-     * Dessiner la nourriture avec couleur selon le type
-     */
-    private void drawFood() {
-        Point pos = food.getPosition();
-
-        // Couleur selon le type
-        String colorStr = food.getColor();
-        Color color = Color.web(colorStr);
-
-        // Effet de clignotement si proche de l'expiration
-        if (food.shouldBlink()) {
-            long time = System.currentTimeMillis();
-            if ((time / 200) % 2 == 0) { // Clignote toutes les 200ms
-                color = Color.WHITE;
-            }
-        }
-
-        gc.setFill(color);
-
-        if (food.isSpecial()) {
-            // Nourriture spéciale = forme différente + effet
-            gc.fillOval(
-                    pos.x * CELL_SIZE + 1,
-                    pos.y * CELL_SIZE + 1,
-                    CELL_SIZE - 2,
-                    CELL_SIZE - 2
-            );
-
-            // Effet de brillance pour nourriture spéciale
-            gc.setFill(Color.WHITE);
-            gc.fillOval(
-                    pos.x * CELL_SIZE + 4,
-                    pos.y * CELL_SIZE + 4,
-                    CELL_SIZE - 8,
-                    CELL_SIZE - 8
-            );
-        } else {
-            // Nourriture normale = carré simple
-            gc.fillRect(
-                    pos.x * CELL_SIZE + 2,
-                    pos.y * CELL_SIZE + 2,
-                    CELL_SIZE - 4,
-                    CELL_SIZE - 4
-            );
-        }
-    }
-
-    /**
-     * Dessiner les messages d'état
-     */
-    private void drawStatusMessages() {
-        gc.setFill(Color.WHITE);
-        gc.setFont(javafx.scene.text.Font.font("Courier New", 16));
-
-        String message = switch (gameState) {
-            case WAITING_RESTART -> "Appuyez sur ENTRÉE pour commencer !";
-            case PAUSED -> "JEU EN PAUSE - Appuyez sur ESPACE pour reprendre";
-            case GAME_OVER -> "GAME OVER - Appuyez sur R pour rejouer";
-            default -> "";
-        };
-
-        if (!message.isEmpty()) {
-            gc.fillText(message, 50, BOARD_HEIGHT * CELL_SIZE / 2);
-        }
-
-        // Afficher les statistiques globales en game over
-        if (gameState == GameState.GAME_OVER) {
-            gc.setFont(javafx.scene.text.Font.font("Courier New", 12));
-            gc.setFill(Color.YELLOW);
-
-            int baseY = BOARD_HEIGHT * CELL_SIZE / 2 + 40;
-            gc.fillText("High Score: " + scoreManager.getSnakeHighScore(), 50, baseY);
-            gc.fillText("Parties jouées: " + scoreManager.getSnakeGamesPlayed(), 50, baseY + 20);
-            gc.fillText("Score total: " + scoreManager.getSnakeTotalScore(), 50, baseY + 40);
-            gc.fillText("Moyenne: " + scoreManager.getSnakeAverageScore(), 50, baseY + 60);
-        }
-
-        // Afficher le type de nourriture actuelle
-        if (food.isSpecial() && gameState == GameState.PLAYING) {
-            String foodInfo = food.getType().name();
-            if (food.getTimeToExpiration() < Long.MAX_VALUE) {
-                foodInfo += " (" + food.getTimeToExpiration() + "s)";
-            }
-            gc.setFill(Color.YELLOW);
-            gc.setFont(javafx.scene.text.Font.font("Courier New", 12));
-            gc.fillText(foodInfo, 10, 20);
-        }
-    }
-
-    /**
-     * Dessiner la bordure
-     */
-    private void drawBorder() {
-        gc.setStroke(Color.CYAN);
-        gc.setLineWidth(2);
-        gc.strokeRect(0, 0, BOARD_WIDTH * CELL_SIZE, BOARD_HEIGHT * CELL_SIZE);
-    }
-
-    // Getters pour l'interface (corrigés pour utiliser le ScoreManager)
+    // Getters pour l'interface (utilisés par SnakeGame)
     public int getScore() { return currentScore; }
     public int getHighScore() { return scoreManager.getSnakeHighScore(); }
     public int getSnakeLength() { return snake.getLength(); }
     public int getGameSpeed() { return INITIAL_GAME_SPEED - gameSpeed + 50; }
-    public int getTotalScore() { return scoreManager.getSnakeTotalScore(); }
-    public int getGamesPlayed() { return scoreManager.getSnakeGamesPlayed(); }
-    public int getAverageScore() { return scoreManager.getSnakeAverageScore(); }
 }
